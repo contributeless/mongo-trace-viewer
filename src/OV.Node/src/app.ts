@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import Route from './interfaces/Route';
 import MongoConnectionFactory from './logic/MongoConnectionFactory';
@@ -31,6 +32,12 @@ class App {
   }
 
   private initializeMiddlewares() {
+    if (this.env === 'production') {
+      // this.app.use(cors({ origin: 'your.domain.com', credentials: true }));
+    } else if (this.env === 'development') {
+      this.app.use(cors({ origin: true, credentials: true }));
+    }
+
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
 

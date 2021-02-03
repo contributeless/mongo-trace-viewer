@@ -9,7 +9,10 @@ class IndexController {
       const result = await mongoClient.db("local").collection('oplog.rs').find({}, {
         limit:10
       }).toArray();
-      res.json(result);
+      
+      res.json({
+        items: result
+      });
       
     } catch (error) {
       next(error);
