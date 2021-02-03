@@ -40,7 +40,7 @@ class App {
           .catch(next);
       };
 
-    this.app.use(asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+    this.app.use('/db', asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
       const connection = await MongoConnectionFactory.getConnection();
       ResponseUtils.setMongoConnection(res, connection);
       try {
@@ -50,7 +50,6 @@ class App {
         connection.close();
       }
     }));
-
   }
 
   private initializeRoutes(routes: Route[]) {

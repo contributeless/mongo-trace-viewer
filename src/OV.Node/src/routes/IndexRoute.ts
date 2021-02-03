@@ -3,7 +3,7 @@ import IndexController from '../controllers/IndexController';
 import Route from '../interfaces/Route';
 
 class IndexRoute implements Route {
-  public path = '/';
+  public path = '/db';
   public router = Router();
   public indexController = new IndexController();
 
