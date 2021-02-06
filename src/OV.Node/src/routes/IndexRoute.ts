@@ -4,6 +4,7 @@ import Route from '../interfaces/Route';
 
 class IndexRoute implements Route {
   public path = '/db';
+  public prefillPath = '/db/prefill';
   public router = Router();
   public indexController = new IndexController();
 
@@ -12,7 +13,8 @@ class IndexRoute implements Route {
   }
 
   private initializeRoutes() {
-    this.router.get(`${this.path}`, this.indexController.index);
+    this.router.post(`${this.path}`, this.indexController.index);
+    this.router.get(`${this.prefillPath}`, this.indexController.filtersPrefill);
   }
 }
 

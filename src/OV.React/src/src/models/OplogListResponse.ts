@@ -1,3 +1,5 @@
+import { OplogEntry } from "../OplogViewer";
+
 export interface OplogListResponse {
-    items: object[]
+    items: OplogEntry[]
 }

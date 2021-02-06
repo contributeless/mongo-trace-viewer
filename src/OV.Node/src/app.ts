@@ -18,6 +18,11 @@ class App {
 
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
+    this.app.use('/db', App.asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+      const connection = ResponseUtils.getMongoConnection(res);
+      await connection.close();
+      next();
+    }));
     this.initializeErrorHandling();
   }
 
@@ -30,7 +35,11 @@ class App {
   public getServer() {
     return this.app;
   }
-
+  static asyncMiddleware = fn =>
+    (req: Request, res: Response, next: NextFunction) => {
+      Promise.resolve(fn(req, res, next))
+        .catch(next);
+    };
   private initializeMiddlewares() {
     if (this.env === 'production') {
       // this.app.use(cors({ origin: 'your.domain.com', credentials: true }));
@@ -41,22 +50,15 @@ class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
 
-    const asyncMiddleware = fn =>
-      (req: Request, res: Response, next: NextFunction) => {
-        Promise.resolve(fn(req, res, next))
-          .catch(next);
-      };
+    
 
-    this.app.use('/db', asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+    this.app.use('/db', App.asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
       const connection = await MongoConnectionFactory.getConnection();
       ResponseUtils.setMongoConnection(res, connection);
-      try {
-        next();
-      }
-      finally {
-        connection.close();
-      }
+      next();
     }));
+
+   
   }
 
   private initializeRoutes(routes: Route[]) {
