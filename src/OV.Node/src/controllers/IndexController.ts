@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { CollectionAggregationOptions } from 'mongodb';
 import { ChildOplogEntryEntity, OplogEntryEntity, OplogEntryEntityBase, OplogEntryOperation, OplogEntryTransactionOperation } from '../Entities/OplogEntryEntity';
 import { OplogChildEntryModel, OplogEntryModel, OplogEntryModelBase } from '../models/OplogEntryModel';
 import { OplogFilterModel } from '../models/OplogFilterModel';
@@ -12,21 +13,29 @@ class IndexController {
 
       const mongoClient = ResponseUtils.getMongoConnection(res);
 
-      const result: OplogEntryEntity[] = await mongoClient.db("local").collection<OplogEntryEntity>('oplog.rs').find({
-        $or: [
-          {ns: `${filter.database}.${filter.collection}`},
-          {
-            ns: "admin.$cmd",
-            "o.applyOps.ns":  `${filter.database}.${filter.collection}`
-          }
-        ]
-      }, {
-        limit:3,
-        // sort: {
-        //   ts: -1
-        // },
 
-      }).toArray();
+      const result: OplogEntryEntity[] = await mongoClient.db("local").collection<OplogEntryEntity>('oplog.rs').aggregate([{
+        $match: {
+          $or: [
+            {ns: `${filter.database}.${filter.collection}`},
+            {
+              ns: "admin.$cmd",
+              "o.applyOps.ns":  `${filter.database}.${filter.collection}`
+            }
+          ]
+        }
+      },
+      {
+        $sort: {
+          'ts': -1
+         }
+      },
+      {
+        $limit: 10
+      }
+    ], {
+      allowDiskUse: true
+    } as CollectionAggregationOptions ).toArray()
 
       res.json({
         items: result.map(this.prepareOplogBeforeView)
@@ -62,7 +71,7 @@ class IndexController {
     return {
       ...entry,
       ...{
-        collectionName: dbEntry.ns,
+        collectionName: dbEntry.ns.replace(/^.+\./, ''),
         operationType: operationType,
         entityId: entityId,
         operation: this.isCommandOperation(dbEntry.o) ? null : dbEntry.o
