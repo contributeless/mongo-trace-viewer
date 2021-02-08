@@ -1,8 +1,9 @@
 import * as React from 'react';
+import { OplogEntry } from './models/OplogEntry';
 import { PrefillResponse } from './models/PrefillResponse';
-import { OplogEntry, OplogViewer } from './OplogViewer';
-import { ConfigService } from './Services/ConfigService';
-import { OplogService } from './Services/OplogService';
+import { OplogViewer } from './views/OplogViewer';
+import { ConfigService } from './services/ConfigService';
+import { OplogService } from './services/OplogService';
 
 type Props = {
 

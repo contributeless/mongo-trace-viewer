@@ -1,29 +1,7 @@
-import * as React from 'react';
-import ReactJson from 'react-json-view'
-import { OplogOperationType } from './models/OplogOperationType';
-import './oplog.styl'
-export interface OplogEntry  extends OplogEntryModelBase {
-    actionDateTime: Date;
-    transactionId: string;
-    childEntries: OplogChildEntryModel[]
-}
-export interface OplogEntryModelBase {
-    collectionName: string;
-    operationType: OplogOperationType;
-    entityId: string;
-    operation: any
-}
-
-export interface OplogChildEntryModel extends OplogEntryModelBase {
-}
-
-type Props = {
-    entries: OplogEntry[]
-};
-type State = {
-
-};
-
+import React from "react";
+import ReactJson from "react-json-view";
+import { OplogEntry, OplogEntryModelBase } from "../models/OplogEntry";
+import { OplogOperationType } from "../models/OplogOperationType";
 
 type OplogEntryProps = {
     entry: OplogEntry;
@@ -33,7 +11,7 @@ type OplogEntryState = {
     isAccordionOpened: boolean;
 };
 
-export class OplogEntry extends React.Component<OplogEntryProps, OplogEntryState> {
+export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntryState> {
     
     constructor(props: OplogEntryProps) {
         super(props);
@@ -66,7 +44,7 @@ export class OplogEntry extends React.Component<OplogEntryProps, OplogEntryState
 
         return <div className="oplog-operation">
             <h2 className="oplog-operation__collection">{operationInfo.collectionName}</h2>
-            <span className="oplog-operation__collection-action">{actionString}</span>
+            <div className="oplog-operation__collection-action">{actionString}</div>
             {changesMarkup}
         </div>
     } 
@@ -107,7 +85,7 @@ export class OplogEntry extends React.Component<OplogEntryProps, OplogEntryState
                     <span className="oplog__item-transaction">{!!entry.transactionId ? `Transaction №: ${entry.transactionId}` : "No transaction"}</span>
                 </div>
                 <div className="oplog__item-header-additional-info">
-                    <span className="oplog__item-collections">{this.getInvolvedCollections(entry)}</span>
+                    <div className="oplog__item-collections">{this.getInvolvedCollections(entry)}</div>
                 </div>
                 <div className={`oplog__item-header-toggle ${this.state.isAccordionOpened ? "oplog__item-header-toggle--opened": ""}`} onClick={this.onAccordionToggle}>
                     <i></i>
@@ -121,19 +99,5 @@ export class OplogEntry extends React.Component<OplogEntryProps, OplogEntryState
 
     render() {
         return this.createEntryView(this.props.entry);
-    };
-}
-
-export class OplogViewer extends React.Component<Props, State> {
-    
- 
-    render() {
-        const entries = this.props.entries.map((x, index) => <OplogEntry entry={x} key={index} />);
-
-        return (
-            <div className="oplog__container">
-                {entries}
-            </div>
-        );
     };
 }

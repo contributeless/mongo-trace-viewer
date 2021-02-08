@@ -2,8 +2,12 @@ body, html
    background-color: rgba(246,248,253, 0.5)
 i
    font-style: normal;
+h2
+   margin: 0;
+   padding: 0.2rem 0;
+
 .app 
-   padding: 3rem
+   padding: 1rem 3rem;
    font-family: 'Open Sans',sans-serif;
 .oplog__item
    border-bottom: 2px solid rgba(0,0,0, 0.1);
@@ -16,8 +20,8 @@ i
    border-radius: 2rem;
    box-shadow: 0px 0px 15px 15px rgba(177,208,248,0.15);
    background-color: white
-
-
+.react-json-view
+    margin-top: 0.3rem;
 .react-json-view .variable-row
    overflow-x: auto;
 
@@ -25,11 +29,11 @@ i
     border: 1px solid #0000003b;
     border-radius: 1rem;
     padding: 0.67em 5rem 0.67rem 1.5rem;
-    background-color: #e4e2e266;
+    background-color: rgba(212, 230, 255, 0.6);
     position: relative;
 
 .oplog-operation__container
-    background-color: #f3f3f3a8;
+    background-color: rgba(229, 240, 255, 0.5);
     padding: 1rem;
     border-bottom-left-radius: 1rem;
     border-bottom-right-radius: 1rem;
@@ -75,3 +79,21 @@ i
     font-size: 0.95rem
 .oplog-operation__entityid
    font-weight: bold;
+
+.oplog-operation__collection-action
+   padding: 0 0 0.5rem 0;
+   font-size: 0.9rem;
+   color: #545454ed;
+
+
+.oplog-operation__changes-label
+   font-size: 0.9rem;
+
+.oplog__item-collections
+   width: 100%
+   text-align: justify;
+
+.oplog__item:first-of-type 
+    margin-top: 0;
+.oplog__filters
+   margin-bottom: 1rem
