@@ -14,6 +14,10 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": false,
+    "lib": [
+      "es2019",
+      "DOM"
+    ]
   },
   "include": [
     "./src/**/*"

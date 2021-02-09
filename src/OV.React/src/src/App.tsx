@@ -1,59 +1,47 @@
 import * as React from 'react';
-import { OplogEntry } from './models/OplogEntry';
-import { PrefillResponse } from './models/PrefillResponse';
-import { OplogViewer } from './views/OplogViewer';
+import { OplogListContainer } from './views/OplogListContainer';
 import { ConfigService } from './services/ConfigService';
-import { OplogService } from './services/OplogService';
+import { Provider } from 'unstated';
+import { OplogFilterContainer } from './state/OplogFilterContainer';
+import { OplogContainer } from './state/OplogContainer';
 
 type Props = {
 
 };
 type State = {
    isDbConnectionConfigured: boolean,
-   oplog: OplogEntry[],
-   prefillInfo: PrefillResponse
+
 };
 
 export class App extends React.Component<Props, State> {
-
+    filterContainer: OplogFilterContainer;
+    oplogContainer: OplogContainer;
     constructor(props: Props){
         super(props);
+        this.filterContainer = new OplogFilterContainer();
+        this.oplogContainer = new OplogContainer(this.filterContainer);
         this.state = {
             isDbConnectionConfigured: true,
-            oplog: [],
-            prefillInfo: {
-                databases: []
-            }
         }
     }
 
     async componentDidMount(){
+
+        await this.filterContainer.initialize();
+        await this.oplogContainer.initialize();
+
         const response = await ConfigService.getConfigStatus();
-
-        const oplog = await OplogService.getOplog({
-            database: "AuthAndBudget",
-            collection: "Authorization",
-            id: null
-        });
-
-        const prefillResponse = await OplogService.prefill();
-
         this.setState({
             isDbConnectionConfigured: response.isConfigured,
-            oplog: oplog.items,
-            prefillInfo: prefillResponse
         })
     }
 
     render() {
         return (
-            <div>
+            <Provider inject={[this.filterContainer, this.oplogContainer]}>
                 {/* <div>Is connection string present: {this.state.isDbConnectionConfigured.toString()}</div> */}
-                {/* <br /> */}
-                {/* <div>{JSON.stringify(this.state.prefillInfo)}</div> */}
-                {/* <br /> */}
-                <OplogViewer entries={this.state.oplog}></OplogViewer>
-            </div>
+                <OplogListContainer />
+            </Provider>
         );
     };
 }

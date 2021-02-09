@@ -1,5 +1,6 @@
 export interface OplogFilterModel {
-    database: string;
-    collection: string;
-    id: string | null;
+    database: string | "";
+    collection: string | "";
+    recordId: string | "";
+    filterId: string | "";
 }
