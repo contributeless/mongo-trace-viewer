@@ -1,0 +1,61 @@
+button {
+  font-size: 1.5rem;
+}
+
+// Reset default button styles
+button.button {
+  border: none;
+  background-color: transparent;
+  font-family: inherit;
+  padding: 0;
+  cursor: pointer;
+
+  @media screen and (-ms-high-contrast: active) {
+    border: 2px solid currentcolor;
+  }
+}
+
+a.button,
+button.button {
+  // Display
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: start; // Optional - see "Gotchas"
+
+  // Visual
+  background-color: #3e68ff;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.18);
+
+  // Size
+  padding: 0.25em 0.75em;
+  min-width: 10ch;
+  min-height: 44px;
+
+  // Text
+  text-align: center;
+  line-height: 1.1;
+
+  transition: 220ms all ease-in-out;
+
+  &:hover,
+  &:active {
+    background-color: scale-color(#3e68ff, $lightness: -20%);
+  }
+
+  &:focus {
+    outline-style: solid;
+    outline-color: transparent;
+    box-shadow: 0 0 0 4px scale-color(#3e68ff, $lightness: -40%);
+  }
+
+  &--small {
+    font-size: 1.15rem;
+  }
+
+  &--block {
+    width: 100%;
+  }
+}

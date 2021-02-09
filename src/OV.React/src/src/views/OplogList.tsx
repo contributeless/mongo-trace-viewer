@@ -1,7 +1,7 @@
 import React from "react";
 import { Subscribe } from "unstated";
 import { OplogContainer } from "../state/OplogContainer";
-import { OplogEntryViewer } from "./OplogEntry";
+import { OplogEntryViewer } from "./OplogEntryViewer";
 
 export class OplogList extends React.Component<{}, {}> {
     render() {

@@ -19,7 +19,6 @@ export class OplogContainer extends Container<OplogContainerState> {
     }
 
     initialize = async (): Promise<void> => {
-
         await this.reloadList();
     }
 

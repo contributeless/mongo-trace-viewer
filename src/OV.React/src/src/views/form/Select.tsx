@@ -1,5 +1,5 @@
-import { POINT_CONVERSION_COMPRESSED } from "constants";
 import React from "react";
+import "./select.styl";
 
 export interface SelectItem {
     value: string;
@@ -20,9 +20,9 @@ export interface SelectProps {
 export function Select(props: SelectProps) {
     return (<div className={`form-input form-select ${props.className ?? ""}`}>
         {!!props.label && <label htmlFor={props.id ?? props.name}>{props.label}</label>}
-        <select name={props.name} id={props.id ?? props.name} value={props.value} onChange={(e) => props.onChange(e.target.value)}>
+        <select className="select-css" name={props.name} id={props.id ?? props.name} value={props.value} onChange={(e) => props.onChange(e.target.value)}>
             {!!props.pleaseSelectLabel && <option value="">{props.pleaseSelectLabel}</option>}
-            <>{props.options.map(x => <option value={x.value}>{x.name}</option>)}</>
+            <>{props.options.map(x => <option value={x.value} key={x.value}>{x.name}</option>)}</>
         </select>
     </div>
     );

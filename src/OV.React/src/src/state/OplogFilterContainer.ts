@@ -34,7 +34,7 @@ export class OplogFilterContainer extends Container<OplogFilterContainerState> {
         return this.state.databaseOptions.map(x => ({
             name: x.database,
             value: x.database
-        }));
+        })).sort((a, b) => a.name < b.name ? -1 : (a.name > b.name ? 1 : 0));
     }
 
     getCollectionOptions = (): SelectItem[] => {
@@ -45,6 +45,7 @@ export class OplogFilterContainer extends Container<OplogFilterContainerState> {
         return this.state.databaseOptions
             .filter(x => x.database === this.currentFilter.database)
             .flatMap(x => x.collections.map(coll => ({ name: coll, value: coll })))
+            .sort((a, b) => a.name < b.name ? -1 : (a.name > b.name ? 1 : 0));
     }
 
     get currentFilter(): OplogFilterModel {

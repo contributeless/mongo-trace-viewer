@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { CollectionAggregationOptions } from 'mongodb';
+import { CollectionAggregationOptions, ObjectID } from 'mongodb';
 import { ChildOplogEntryEntity, OplogEntryEntity, OplogEntryEntityBase, OplogEntryOperation, OplogEntryTransactionOperation } from '../Entities/OplogEntryEntity';
 import { OplogChildEntryModel, OplogEntryModel, OplogEntryModelBase } from '../models/OplogEntryModel';
 import { OplogFilterModel } from '../models/OplogFilterModel';
@@ -13,15 +13,47 @@ class IndexController {
 
       const mongoClient = ResponseUtils.getMongoConnection(res);
 
+      const databaseFilter = !!filter.database ? {
+        $or: [
+          {ns: { $regex: new RegExp(`^${filter.database}\\..+`) }},
+          {
+            ns: "admin.$cmd",
+            "o.applyOps.ns":  { $regex: new RegExp(`^${filter.database}\..+`) }
+          }
+        ]
+      }: null;
+
+      const collectionFilter = !!filter.database && !!filter.collection ? {
+        $or: [
+          {ns: `${filter.database}.${filter.collection}`},
+          {
+            ns: "admin.$cmd",
+            "o.applyOps.ns":  `${filter.database}.${filter.collection}`
+          }
+        ]
+      } : null;
+
+      const recordIdFilter = !!filter.recordId ? {
+        $or: [
+          {"o2._id": new ObjectID(filter.recordId) },
+          {"o._id": new ObjectID(filter.recordId)},
+          {
+            ns: "admin.$cmd",
+            "o.applyOps.o2._id": new ObjectID(filter.recordId)
+          },
+          {
+            ns: "admin.$cmd",
+            "o.applyOps.o._id": new ObjectID(filter.recordId)
+          },
+        ]
+      } : null;
+
 
       const result: OplogEntryEntity[] = await mongoClient.db("local").collection<OplogEntryEntity>('oplog.rs').aggregate([{
         $match: {
-          $or: [
-            {ns: `${filter.database}.${filter.collection}`},
-            {
-              ns: "admin.$cmd",
-              "o.applyOps.ns":  `${filter.database}.${filter.collection}`
-            }
+          $and: [
+            (!!collectionFilter ? collectionFilter : databaseFilter) ?? {},
+            recordIdFilter ?? {},
           ]
         }
       },
@@ -71,7 +103,7 @@ class IndexController {
     return {
       ...entry,
       ...{
-        collectionName: dbEntry.ns.replace(/^.+\./, ''),
+        collectionName: dbEntry.ns.replace(/^.+?\./, ''),
         operationType: operationType,
         entityId: entityId,
         operation: this.isCommandOperation(dbEntry.o) ? null : dbEntry.o
@@ -119,7 +151,7 @@ class IndexController {
       // List all the available databases
       const databases: any = await adminDb.listDatabases({nameOnly: true});
 
-      const configs = [];
+      let configs = [];
 
       for(var i=0; i < databases.databases.length; i++){
         const db = databases.databases[i];
@@ -130,6 +162,8 @@ class IndexController {
           collections: collections.map(x => x.name)
         })
       }
+
+      configs = configs.filter(x => x.database != "admin" && x.database != "config" &&  x.database != "local" );
 
       res.json({
         databases: configs

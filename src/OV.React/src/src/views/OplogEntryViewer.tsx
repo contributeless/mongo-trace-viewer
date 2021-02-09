@@ -23,7 +23,10 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
     renderOplogOperation = (operationInfo: OplogEntryModelBase) => {
         let changesMarkup = null;
         if (operationInfo.operationType === OplogOperationType.insert
-            || operationInfo.operationType === OplogOperationType.update) {
+            || operationInfo.operationType === OplogOperationType.update
+            || operationInfo.operationType === OplogOperationType.unknown
+            || operationInfo.operationType === OplogOperationType.command
+            ) {
             changesMarkup = <div className="oplog-operation__changes-container">
                 <span className="oplog-operation__changes-label">Changes:</span>
                 <ReactJson src={operationInfo.operation} name={null} displayDataTypes={false} sortKeys={true} collapsed={true} />
@@ -65,9 +68,15 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
     }
 
     getInvolvedCollections = (entry:OplogEntry): string => {
-        return !!entry.childEntries && !!entry.childEntries.length
+        const collectionName = !!entry.childEntries && !!entry.childEntries.length
             ? entry.childEntries.map(x => x.collectionName).join(", ")
             : entry.collectionName;
+
+        if(!collectionName){
+            return "System operation";
+        }
+
+        return collectionName;
     }
 
     onAccordionToggle = () => {
