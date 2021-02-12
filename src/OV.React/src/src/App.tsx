@@ -1,9 +1,11 @@
 import * as React from 'react';
 import { OplogListContainer } from './views/OplogListContainer';
 import { ConfigService } from './services/ConfigService';
-import { Provider } from 'unstated';
+import { Provider, Subscribe } from 'unstated';
 import { OplogFilterContainer } from './state/OplogFilterContainer';
 import { OplogContainer } from './state/OplogContainer';
+import { Loader } from './views/Loader';
+import { ServiceContainer } from './state/ServiceContainer';
 
 type Props = {
 
@@ -16,10 +18,13 @@ type State = {
 export class App extends React.Component<Props, State> {
     filterContainer: OplogFilterContainer;
     oplogContainer: OplogContainer;
+    serviceContainer: ServiceContainer;
     constructor(props: Props){
         super(props);
-        this.filterContainer = new OplogFilterContainer();
-        this.oplogContainer = new OplogContainer(this.filterContainer);
+
+        this.serviceContainer = new ServiceContainer();
+        this.filterContainer = new OplogFilterContainer(this.serviceContainer);
+        this.oplogContainer = new OplogContainer(this.filterContainer, this.serviceContainer);
         this.state = {
             isDbConnectionConfigured: true,
         }
@@ -38,9 +43,17 @@ export class App extends React.Component<Props, State> {
 
     render() {
         return (
-            <Provider inject={[this.filterContainer, this.oplogContainer]}>
-                {/* <div>Is connection string present: {this.state.isDbConnectionConfigured.toString()}</div> */}
-                <OplogListContainer />
+            <Provider inject={[this.filterContainer, this.oplogContainer, this.serviceContainer]}>
+                <>
+                    {/* <div>Is connection string present: {this.state.isDbConnectionConfigured.toString()}</div> */}
+                    <OplogListContainer />
+
+                    <Subscribe to={[ServiceContainer]}>
+                        {(service: ServiceContainer) => (
+                            service.isLoadingEnabled() && <Loader />
+                        )}
+                    </Subscribe>
+                </>
             </Provider>
         );
     };

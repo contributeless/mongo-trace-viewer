@@ -1,8 +1,9 @@
-import { Container } from "unstated";
 import { OplogFilterModel } from "../models/OplogFilterModel";
 import { DatabasePrefillModel } from "../models/PrefillResponse";
 import { OplogService } from "../services/OplogService";
 import { SelectItem } from "../views/form/Select";
+import { BaseContainer } from "./BaseContainer";
+import { ServiceContainer } from "./ServiceContainer";
 
 export interface OplogFilterContainerState {
     currentFilter: OplogFilterModel;
@@ -10,7 +11,7 @@ export interface OplogFilterContainerState {
     databaseOptions: DatabasePrefillModel[];
 }
 
-export class OplogFilterContainer extends Container<OplogFilterContainerState> {
+export class OplogFilterContainer extends BaseContainer<OplogFilterContainerState> {
     state: OplogFilterContainerState = {
         currentFilter: {
             collection: "",
@@ -22,8 +23,12 @@ export class OplogFilterContainer extends Container<OplogFilterContainerState> {
         databaseOptions: []
     };
 
+    constructor(serviceContainer: ServiceContainer){
+        super(serviceContainer);
+    }
+
     initialize = async (): Promise<void> => {
-        const prefillResponse = await OplogService.prefill();
+        const prefillResponse = await this.makeRequest(() => OplogService.prefill());
         
         await this.setState({
             databaseOptions: prefillResponse.databases
