@@ -9,6 +9,7 @@ export interface OplogEntryModelBase {
 
 export interface OplogEntryModel extends OplogEntryModelBase {
     actionDateTime: Date;
+    timestamp: string;
     transactionId: string;
     childEntries: OplogChildEntryModel[]
 }

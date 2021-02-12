@@ -2,6 +2,7 @@ import { OplogOperationType } from "./OplogOperationType";
 
 export interface OplogEntry  extends OplogEntryModelBase {
     actionDateTime: Date;
+    timestamp: string;
     transactionId: string;
     childEntries: OplogChildEntryModel[]
 }

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { CollectionAggregationOptions, ObjectID } from 'mongodb';
+import { CollectionAggregationOptions, ObjectID, Timestamp } from 'mongodb';
 import { ChildOplogEntryEntity, OplogEntryEntity, OplogEntryEntityBase, OplogEntryOperation, OplogEntryTransactionOperation } from '../Entities/OplogEntryEntity';
 import { OplogChildEntryModel, OplogEntryModel, OplogEntryModelBase } from '../models/OplogEntryModel';
 import { OplogFilterModel } from '../models/OplogFilterModel';
@@ -11,68 +11,87 @@ class IndexController {
     try {
       const filter: OplogFilterModel = req.body;
 
+      const paging = filter.paging ?? {
+        ascending: true,
+        orderBy: "ts",
+        pageNumber: 1,
+        pageSize: 10
+      }
+
       const mongoClient = ResponseUtils.getMongoConnection(res);
+
+      const tsFilter = !!filter.maxTimestamp ? {
+        ts: {$lt : Timestamp.fromString(filter.maxTimestamp)}
+      }: null;
 
       const databaseFilter = !!filter.database ? {
         $or: [
-          {ns: { $regex: new RegExp(`^${filter.database}\\..+`) }},
+          { ns: { $regex: new RegExp(`^${filter.database}\\..+`) } },
           {
             ns: "admin.$cmd",
-            "o.applyOps.ns":  { $regex: new RegExp(`^${filter.database}\..+`) }
+            "o.applyOps.ns": { $regex: new RegExp(`^${filter.database}\..+`) }
           }
         ]
-      }: null;
+      } : null;
 
       const collectionFilter = !!filter.database && !!filter.collection ? {
         $or: [
-          {ns: `${filter.database}.${filter.collection}`},
+          { ns: `${filter.database}.${filter.collection}` },
           {
             ns: "admin.$cmd",
-            "o.applyOps.ns":  `${filter.database}.${filter.collection}`
+            "o.applyOps.ns": `${filter.database}.${filter.collection}`
           }
         ]
       } : null;
 
+      const id = !!filter.recordId ? new ObjectID(filter.recordId) : null;
+
       const recordIdFilter = !!filter.recordId ? {
         $or: [
-          {"o2._id": new ObjectID(filter.recordId) },
-          {"o._id": new ObjectID(filter.recordId)},
+          { "o2._id": id },
+          { "o._id": id },
           {
             ns: "admin.$cmd",
-            "o.applyOps.o2._id": new ObjectID(filter.recordId)
+            "o.applyOps.o2._id": id
           },
           {
             ns: "admin.$cmd",
-            "o.applyOps.o._id": new ObjectID(filter.recordId)
+            "o.applyOps.o._id": id
           },
         ]
       } : null;
 
+
+      const orderByClause = {};
+      orderByClause[paging.orderBy] = paging.ascending ? 1 : -1;
 
       const result: OplogEntryEntity[] = await mongoClient.db("local").collection<OplogEntryEntity>('oplog.rs').aggregate([{
         $match: {
           $and: [
+            tsFilter ?? {},
             (!!collectionFilter ? collectionFilter : databaseFilter) ?? {},
             recordIdFilter ?? {},
           ]
         }
       },
       {
-        $sort: {
-          'ts': -1
-         }
+        $sort: orderByClause
       },
       {
-        $limit: 10
+        $skip: (paging.pageNumber - 1) * paging.pageSize,
+        
+      },
+      {
+        $limit: paging.pageSize,
       }
-    ], {
-      allowDiskUse: true
-    } as CollectionAggregationOptions ).toArray()
+      ], {
+        allowDiskUse: true
+      } as CollectionAggregationOptions).toArray()
 
       res.json({
         items: result.map(this.prepareOplogBeforeView)
       });
-      
+
     } catch (error) {
       next(error);
     }
@@ -85,6 +104,7 @@ class IndexController {
 
     return {
       actionDateTime: !entry.ts ? undefined : new Date(entry.ts.getHighBits() * 1000),
+      timestamp: entry.ts.toString(),
       transactionId: entry.txnNumber?.toString() ?? null,
       childEntries: this.getChildEntries(entry.o),
       ...result

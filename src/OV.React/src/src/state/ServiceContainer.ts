@@ -10,12 +10,14 @@ export class ServiceContainer extends Container<ServiceContainerState>{
     }
 
     incrementLoadersCount = () => {
+        console.log("loaders count", this.state.loadersCount + 1)
         return this.setState({
             loadersCount: this.state.loadersCount + 1
         })
     }
 
     decrementLoadersCount = () => {
+        console.log("loaders count", this.state.loadersCount - 1)
         return this.setState({
             loadersCount: this.state.loadersCount - 1
         })

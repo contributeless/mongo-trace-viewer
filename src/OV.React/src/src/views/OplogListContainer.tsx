@@ -18,7 +18,7 @@ export class OplogListContainer extends React.Component<{}, {}> {
                     <div className="oplog__container oplog__list">
                         <OplogList />
                     </div>
-                    <SidePanel pageSize={10} />
+                    <SidePanel />
                 </div>
             </div>
         );

@@ -1,10 +1,12 @@
 import React from "react";
 import  "./sidePanel.styl";
 import RefreshIcon from "./icons/refresh.svg";
+import { Subscribe } from "unstated";
+import { OplogContainer } from "../state/OplogContainer";
 
 
 export interface SidePanelProps {
-    pageSize: number;
+
 }
 
 interface PageSizerOption {
@@ -23,13 +25,15 @@ const pageSizerOptions: PageSizerOption[] = [
     },
 ]
 
-export function SidePanel(props: SidePanelProps) {
-    return <div className="side-panel__container">
-        <div className="side-panel__changes-detector hanges-detector">
-            <RefreshIcon className="changes-detector__icon"></RefreshIcon>
-        </div>
-        <div className="side-panel__page-sizer page-sizer">
-            {pageSizerOptions.map(x => <div className="page-sizer-option">{x.size}</div>)}
-        </div>
-    </div>
+export function SidePanel() {
+    return <Subscribe to={[OplogContainer]}>
+        {(oplog: OplogContainer) => (<div className="side-panel__container">
+            <div className="side-panel__changes-detector hanges-detector">
+                <RefreshIcon className="changes-detector__icon"></RefreshIcon>
+            </div>
+            <div className="side-panel__page-sizer page-sizer">
+                {pageSizerOptions.map(x => <div className="page-sizer-option">{x.size}</div>)}
+            </div>
+        </div>)}
+    </Subscribe>
 }
