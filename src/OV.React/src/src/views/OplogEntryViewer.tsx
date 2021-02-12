@@ -5,7 +5,8 @@ import { OplogOperationType } from "../models/OplogOperationType";
 
 type OplogEntryProps = {
     entry: OplogEntry;
-
+    selectedRecordId: string;
+    selectedCollection: string;
 };
 type OplogEntryState = {
     isAccordionOpened: boolean;
@@ -33,20 +34,34 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
             </div>
         }
 
+
+        let selectedEntityIdClass = null;
+        if(!!operationInfo.entityId && !!this.props.selectedRecordId){
+            if(operationInfo.entityId === this.props.selectedRecordId){
+                selectedEntityIdClass = "operation__entityid--highlight";
+            }
+        }
+
         let actionString = null;
 
-        if(operationInfo.operationType === OplogOperationType.insert){
-            actionString = <>Record with id <span className="oplog-operation__entityid">{operationInfo.entityId}</span> created</>;
+        if (operationInfo.operationType === OplogOperationType.insert) {
+            actionString = <>Record with id <span className={`oplog-operation__entityid ${selectedEntityIdClass ?? ""}`}>{operationInfo.entityId}</span> created</>;
         }
-        if(operationInfo.operationType === OplogOperationType.update){
-            actionString = <>Record with id <span className="oplog-operation__entityid">{operationInfo.entityId}</span> updated</>;
+        if (operationInfo.operationType === OplogOperationType.update) {
+            actionString = <>Record with id <span className={`oplog-operation__entityid ${selectedEntityIdClass ?? ""}`}>{operationInfo.entityId}</span> updated</>;
         }
-        if(operationInfo.operationType === OplogOperationType.delete){
-            actionString = <>Record with id <span className="oplog-operation__entityid">{operationInfo.entityId}</span> deleted</>;
+        if (operationInfo.operationType === OplogOperationType.delete) {
+            actionString = <>Record with id <span className={`oplog-operation__entityid ${selectedEntityIdClass ?? ""}`}>{operationInfo.entityId}</span> deleted</>;
+        }
+
+        let collectionClass = null;
+
+        if(operationInfo.collectionName == this.props.selectedCollection){
+            collectionClass = "oplog__collection--highlight";
         }
 
         return <div className="oplog-operation">
-            <h2 className="oplog-operation__collection">{operationInfo.collectionName}</h2>
+            <h2 className={`oplog-operation__collection ${collectionClass}`}>{operationInfo.collectionName}</h2>
             <div className="oplog-operation__collection-action">{actionString}</div>
             {changesMarkup}
         </div>
@@ -66,17 +81,25 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
             </div>
         }
     }
+    
+    onlyUnique = (value: string, index: number, self: string[]) => {
+        return self.indexOf(value) === index;
+    }
 
-    getInvolvedCollections = (entry:OplogEntry): string => {
-        const collectionName = !!entry.childEntries && !!entry.childEntries.length
-            ? entry.childEntries.map(x => x.collectionName).join(", ")
-            : entry.collectionName;
+    getInvolvedCollections = (entry:OplogEntry): React.ReactNode[] => {
+        let collectionNames = !!entry.childEntries && !!entry.childEntries.length
+            ? entry.childEntries.map(x => x.collectionName).sort()
+            : (!!entry.collectionName ? [entry.collectionName] : []);
 
-        if(!collectionName){
-            return "System operation";
+        if(!collectionNames.length){
+            collectionNames = ["System operation"];
         }
 
-        return collectionName;
+        return collectionNames.filter(this.onlyUnique)
+        .map<React.ReactNode>(t => <span className={`${t === this.props.selectedCollection ? "oplog__collection--highlight": "" }`}>{t}</span>)
+         .reduce((accu: React.ReactNode[], elem: React.ReactNode) => {
+            return !accu.length ? [elem] : [...accu, ', ', elem]
+        }, [])
     }
 
     onAccordionToggle = () => {

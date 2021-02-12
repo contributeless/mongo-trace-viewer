@@ -28,6 +28,7 @@
     "@babel/preset-env": "^7.12.13",
     "@babel/preset-react": "^7.12.13",
     "@babel/preset-typescript": "^7.12.13",
+    "@svgr/webpack": "^5.5.0",
     "@types/node": "^14.14.22",
     "@types/react": "^17.0.1",
     "@types/react-dom": "^17.0.0",
