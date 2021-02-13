@@ -31,7 +31,9 @@ export function SidePanel() {
         {(oplog: OplogContainer) => (<div className="side-panel__container">
             <div className="side-panel__changes-detector changes-detector" onClick={oplog.loadNewItems}>
                 <RefreshIcon className="changes-detector__icon"></RefreshIcon>
+                {/* <div className="changes-detector__tooltip">There are new records present on server</div> */}
             </div>
+            <div className="side-panel-separator"></div>
             <div className="side-panel__page-sizer page-sizer__container">
                 <RadioGroup options={pageSizerOptions.map(x => ({ name: x.size.toString(), value: x.size.toString() }))}
                     className="page-sizer"

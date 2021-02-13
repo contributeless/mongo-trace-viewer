@@ -1,17 +1,29 @@
 .side-panel__container
     position absolute;
-    right: 1rem
-    top: 1rem
+    right: 0rem
+    top: 0rem
+    padding: 0.8rem;
+    border: 2px solid rgba(151,197,255,0.7);
+    border-radius: 2rem;
+    box-shadow: 0px 0px 15px 15px rgba(177,208,248,0.15);
+    background-color: #fff;
+    .side-panel__page-sizer
+        margin-top: 0.8rem
 
 
 .changes-detector__icon
-    width 1rem
-    height 1rem
+    width: 1.4rem;
+    height 1.4rem;
 
 
 .page-sizer
     label
         cursor: pointer;
+        padding: 0 0.1rem;
+        border-bottom: 3px solid white;
+        &:hover
+            border-bottom: 3px solid #7fb9fdab;
+
 
     input[type="radio"]
         display: none
@@ -19,6 +31,41 @@
         position: absolute
         left: -9999px
     input:checked + label 
-        background-color: aquamarine;
+        border-bottom: 3px solid rgb(127 185 253);
+        
+        
+    .form-radio-option__container
+        display: flex;
+        justify-content: center;
+        flex-direction: row
 .changes-detector
     cursor: pointer
+
+.page-sizer__container
+    .form-radio-option__container 
+        margin-bottom: 0.5rem;
+
+.side-panel__changes-detector
+    margin-bottom: 0.5rem
+    padding: 0 0.3rem
+
+.side-panel-separator
+    border-bottom: 1px solid gray;
+
+
+.side-panel__changes-detector.changes-detector:before
+    content: "\0021";
+    position: absolute;
+    top: -13px;
+    left: 28px;
+    z-index: 100;
+    font-size: 1.6rem;
+    color: #f79128;
+    font-weight: bold;
+.side-panel__changes-detector
+    position relative
+.changes-detector__icon
+    animation: spin 1s linear infinite;
+
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+

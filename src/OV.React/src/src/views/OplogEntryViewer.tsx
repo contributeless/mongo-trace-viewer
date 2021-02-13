@@ -61,8 +61,8 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
         }
 
         return <div className="oplog-operation">
-            <h2 className={`oplog-operation__collection ${collectionClass}`}>{operationInfo.collectionName}</h2>
-            <div className="oplog-operation__collection-action">{actionString}</div>
+            {!!operationInfo.collectionName && <h2 className={`oplog-operation__collection ${collectionClass}`}>{operationInfo.collectionName}</h2>}
+            {!!actionString && <div className="oplog-operation__collection-action">{actionString}</div>}
             {changesMarkup}
         </div>
     } 
