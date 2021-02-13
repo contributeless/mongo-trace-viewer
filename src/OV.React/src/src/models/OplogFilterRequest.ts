@@ -5,6 +5,7 @@ export interface OplogFilterRequest {
     collection: string | null;
     recordId: string | null;
     maxTimestamp: string | null;
+    minTimestamp: string | null;
 
     paging: PagingModel;
 }

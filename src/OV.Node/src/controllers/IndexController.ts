@@ -20,8 +20,12 @@ class IndexController {
 
       const mongoClient = ResponseUtils.getMongoConnection(res);
 
-      const tsFilter = !!filter.maxTimestamp ? {
+      const maxTsFilter = !!filter.maxTimestamp ? {
         ts: {$lt : Timestamp.fromString(filter.maxTimestamp)}
+      }: null;
+
+      const minTsFilter = !!filter.minTimestamp ? {
+        ts: {$gt : Timestamp.fromString(filter.minTimestamp)}
       }: null;
 
       const databaseFilter = !!filter.database ? {
@@ -68,7 +72,7 @@ class IndexController {
       const result: OplogEntryEntity[] = await mongoClient.db("local").collection<OplogEntryEntity>('oplog.rs').aggregate([{
         $match: {
           $and: [
-            tsFilter ?? {},
+            {...(maxTsFilter ?? {}), ...(minTsFilter ?? {})},
             (!!collectionFilter ? collectionFilter : databaseFilter) ?? {},
             recordIdFilter ?? {},
           ]

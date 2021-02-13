@@ -1,10 +1,12 @@
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
+import path from 'path';
 import Route from './interfaces/Route';
 import MongoConnectionFactory from './logic/MongoConnectionFactory';
 import errorMiddleware from './middlewares/ErrorMiddleware';
 import { logger, stream } from './utils/Logger';
 import ResponseUtils from './utils/ResponseUtils';
+import favicon from 'serve-favicon'
 
 class App {
   public app: express.Application;
@@ -15,7 +17,7 @@ class App {
     this.app = express();
     this.port = process.env.PORT || 3000;
     this.env = process.env.NODE_ENV || 'development';
-
+    this.app.use(favicon(path.join(__dirname, 'public', 'favicon.png')))
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
     this.app.use('/db', App.asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {

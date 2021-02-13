@@ -9,13 +9,17 @@ export class BaseContainer<State extends object> extends Container<State> {
         this.serviceContainer = serviceContainer;
     }
 
-    makeRequest = async <TResponse>(func: () => Promise<TResponse>): Promise<TResponse> => {
+    makeRequest = async <TResponse>(func: () => Promise<TResponse>, skipLoadersChange: boolean = false): Promise<TResponse> => {
         try{
-            await this.serviceContainer.incrementLoadersCount();
+            if(!skipLoadersChange){
+                await this.serviceContainer.incrementLoadersCount();
+            }
             return await func();
         }
         finally {
-            await this.serviceContainer.decrementLoadersCount();
+            if(!skipLoadersChange){
+                await this.serviceContainer.decrementLoadersCount();
+            }
         }
     }
 }

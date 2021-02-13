@@ -53,7 +53,7 @@
     border-bottom: 1px solid gray;
 
 
-.side-panel__changes-detector.changes-detector:before
+.side-panel__changes-detector.changes-detector.changes-detector__new-items-present:before
     content: "\0021";
     position: absolute;
     top: -13px;
@@ -62,10 +62,13 @@
     font-size: 1.6rem;
     color: #f79128;
     font-weight: bold;
+.side-panel__changes-detector.changes-detector.changes-detector__check-running
+    .changes-detector__icon
+        animation: spin 1s linear infinite;
+        
 .side-panel__changes-detector
     position relative
-.changes-detector__icon
-    animation: spin 1s linear infinite;
+
 
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 

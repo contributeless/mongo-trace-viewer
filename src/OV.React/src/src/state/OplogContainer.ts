@@ -1,4 +1,5 @@
 import { OplogEntry } from "../models/OplogEntry";
+import { OplogListResponse } from "../models/OplogListResponse";
 import { OplogService } from "../services/OplogService";
 import { BaseContainer } from "./BaseContainer";
 import { OplogFilterContainer } from "./OplogFilterContainer";
@@ -6,7 +7,9 @@ import { ServiceContainer } from "./ServiceContainer";
 
 export interface OplogContainerState {
     items: OplogEntry[],
-    pageSize: number
+    pageSize: number,
+    isNewItemsPresentCheckRunning: boolean;
+    isNewItemsPresent: boolean;
 }
 
 export enum ListAction {
@@ -18,8 +21,11 @@ export enum ListAction {
 export class OplogContainer extends BaseContainer<OplogContainerState> {
     state: OplogContainerState = {
         items: [],
-        pageSize: 10
+        pageSize: 10,
+        isNewItemsPresentCheckRunning: false,
+        isNewItemsPresent: false,
     };
+    newItemsInterval: NodeJS.Timeout | null = null;
     filterContainer: OplogFilterContainer;
 
     constructor(filterContainer: OplogFilterContainer, serviceContainer: ServiceContainer){
@@ -44,7 +50,12 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
     }
 
     loadNewItems = async () => {
-        console.log("load new items")
+        const descSortedTs = this.state.items.map(x => x.timestamp).sort(function(d1, d2){
+            return d2.localeCompare(d1);
+        })
+
+        const maxTs = descSortedTs.length ? descSortedTs[0] : null;
+        await this.reloadList(null, ListAction.addBefore, maxTs);
     }
 
     loadNextPage = async () => {
@@ -52,41 +63,86 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
             return d1.localeCompare(d2);
         })
 
-        const maxTs = ascSortedTs.length ? ascSortedTs[0] : null;
-        await this.reloadList(maxTs, ListAction.addAfter);
+        const minTs = ascSortedTs.length ? ascSortedTs[0] : null;
+        await this.reloadList(minTs, ListAction.addAfter);
     }
 
-    reloadList = async (maxTimestamp?: string | null, action: ListAction = ListAction.replace) => {
-
+    private fetchOplog = (maxTimestamp: string | null, minTimestamp: string | null, pageSize : number, skipLoadersChange: boolean = false): Promise<OplogListResponse> => {
         const currentFilter = this.filterContainer.currentFilter;
 
-        const oplog = await this.makeRequest(() => OplogService.getOplog({
+        return this.makeRequest(() => OplogService.getOplog({
             database: currentFilter.database || null,
             collection: currentFilter.collection || null,
             recordId: currentFilter.recordId || null,
             maxTimestamp: maxTimestamp ?? null,
+            minTimestamp: minTimestamp ?? null,
             paging: {
                 ascending: false,
                 orderBy: "ts",
-                pageSize: this.state.pageSize,
+                pageSize: pageSize,
                 pageNumber: 1
             }
-        }));
+        }), skipLoadersChange);
+    }
 
+    mergeOplog = async (response: OplogListResponse, action: ListAction = ListAction.replace): Promise<void> => {
         if(action == ListAction.replace) {
             await this.setState({
-                items: oplog.items
+                items: response.items
             })
         } else if(action == ListAction.addAfter){
             await this.setState({
-                items: [...this.state.items, ...oplog.items]
+                items: [...this.state.items, ...response.items]
             })
         } else if(action == ListAction.addBefore){
             await this.setState({
-                items: [...oplog.items, ...this.state.items]
+                items: [...response.items, ...this.state.items]
             })
         }
+    }
 
+    setIsNewItemsAvailable = async () => {
+        if(!!this.newItemsInterval){
+            clearInterval(this.newItemsInterval);
+            this.newItemsInterval = null;
+        }
+
+        const descSortedTs = this.state.items.map(x => x.timestamp).sort(function(d1, d2){
+            return d2.localeCompare(d1);
+        })
+
+        const maxTs = descSortedTs.length ? descSortedTs[0] : null;
+
+        if(!!maxTs){
+            try{
+                await this.setState({
+                    isNewItemsPresentCheckRunning: true
+                });
+                const oplogResponse = await this.fetchOplog(null, maxTs, 1, true);
+
+                await this.setState({
+                    isNewItemsPresent: !!oplogResponse && !!oplogResponse.items && !!oplogResponse.items.length
+                });
+            }
+            finally{
+                await this.setState({
+                    isNewItemsPresentCheckRunning: false
+                });
+            }
+        }
+
+        this.newItemsInterval = setInterval(this.setIsNewItemsAvailable, 5000);
+    }
+
+    reloadList = async (maxTimestamp?: string | null, action: ListAction = ListAction.replace, minTimestamp?: string | null) => {
+        const oplog = await this.fetchOplog(maxTimestamp ?? null, minTimestamp ?? null, this.state.pageSize);
+
+        await this.mergeOplog(oplog, action);
         
+        if(!!this.newItemsInterval){
+            clearInterval(this.newItemsInterval);
+            this.newItemsInterval = null;
+        }
+        this.newItemsInterval = setInterval(this.setIsNewItemsAvailable, 5000);
     }
 }
