@@ -48,8 +48,8 @@ class IndexController {
         ]
       } : null;
 
-      const id = !!filter.recordId ? new ObjectID(filter.recordId) : null;
-
+      const id = !!filter.recordId ? (ObjectID.isValid(filter.recordId) ? new ObjectID(filter.recordId) : filter.recordId) : null;
+      
       const recordIdFilter = !!filter.recordId ? {
         $or: [
           { "o2._id": id },
