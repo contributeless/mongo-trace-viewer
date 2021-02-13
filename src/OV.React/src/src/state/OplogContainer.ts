@@ -28,21 +28,26 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
     }
 
     initialize = async (): Promise<void> => {
-        await this.reloadList();
+        // await this.reloadList();
     }
 
-    setPageSize = (size: number) => {
-        return this.setState({
+    setPageSize = async (size: number) => {
+        await this.setState({
             pageSize: size
-        })
+        });
+
+        await this.reloadList(null, ListAction.replace);
     }
 
     getPageSize = () => {
         return this.state.pageSize;
     }
 
+    loadNewItems = async () => {
+        console.log("load new items")
+    }
+
     loadNextPage = async () => {
-        console.log("load");
         const ascSortedTs = this.state.items.map(x => x.timestamp).sort(function(d1, d2){
             return d1.localeCompare(d2);
         })
@@ -67,8 +72,6 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
                 pageNumber: 1
             }
         }));
-
-        console.log(oplog.items);
 
         if(action == ListAction.replace) {
             await this.setState({

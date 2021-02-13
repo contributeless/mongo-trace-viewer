@@ -96,7 +96,7 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
         }
 
         return collectionNames.filter(this.onlyUnique)
-        .map<React.ReactNode>(t => <span className={`${t === this.props.selectedCollection ? "oplog__collection--highlight": "" }`}>{t}</span>)
+        .map<React.ReactNode>((t, i) => <span key={i} className={`${t === this.props.selectedCollection ? "oplog__collection--highlight": "" }`}>{t}</span>)
          .reduce((accu: React.ReactNode[], elem: React.ReactNode) => {
             return !accu.length ? [elem] : [...accu, ', ', elem]
         }, [])

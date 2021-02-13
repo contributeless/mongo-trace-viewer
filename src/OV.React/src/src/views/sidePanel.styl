@@ -3,10 +3,22 @@
     right: 1rem
     top: 1rem
 
-.page-sizer
-    display: flex;
-    flex-direction: column;
 
 .changes-detector__icon
     width 1rem
     height 1rem
+
+
+.page-sizer
+    label
+        cursor: pointer;
+
+    input[type="radio"]
+        display: none
+        opacity: 0
+        position: absolute
+        left: -9999px
+    input:checked + label 
+        background-color: aquamarine;
+.changes-detector
+    cursor: pointer
