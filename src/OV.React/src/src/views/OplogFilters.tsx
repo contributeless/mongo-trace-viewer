@@ -7,7 +7,7 @@ import { ButtonsGroup } from "./form/ButtonsGroup";
 import { InputGroup } from "./form/InputGroup";
 import { Select } from "./form/Select";
 import { TextInput } from "./form/TextInput";
-import { PopupHost } from "./Popup";
+import { Modal } from "./Modal";
 
 export function OplogFilters() {
     const [isPopupOpened, setIsPopupOpened] = useState(false);
@@ -27,9 +27,9 @@ export function OplogFilters() {
                         <ActionButton label="Save filter" onClick={filters.saveCurrentFilterToFavourites} type='button' />
                         <ActionButton label="Show favourites" onClick={() => setIsPopupOpened(true)} type='button' />
                     </ButtonsGroup>
-                    <PopupHost isOpened={isPopupOpened}>
+                    <Modal isOpened={isPopupOpened}>
                         <div>Sample popup content</div>
-                    </PopupHost>
+                    </Modal>
                 </form>
             )}
         </Subscribe>
