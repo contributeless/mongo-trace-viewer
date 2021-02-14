@@ -27,7 +27,7 @@ export function OplogFilters() {
                         <ActionButton label="Save filter" onClick={filters.saveCurrentFilterToFavourites} type='button' />
                         <ActionButton label="Show favourites" onClick={() => setIsPopupOpened(true)} type='button' />
                     </ButtonsGroup>
-                    <Modal isOpened={isPopupOpened}>
+                    <Modal isOpened={true} onClose={() => setIsPopupOpened(false)}>
                         <div>Sample popup content</div>
                     </Modal>
                 </form>
