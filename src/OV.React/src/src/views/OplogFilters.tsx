@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useState } from "react";
 import { Subscribe } from "unstated";
 import { OplogContainer } from "../state/OplogContainer";
 import { OplogFilterContainer } from "../state/OplogFilterContainer";
@@ -7,9 +7,13 @@ import { ButtonsGroup } from "./form/ButtonsGroup";
 import { InputGroup } from "./form/InputGroup";
 import { Select } from "./form/Select";
 import { TextInput } from "./form/TextInput";
+import { PopupHost } from "./Popup";
 
 export function OplogFilters() {
+    const [isPopupOpened, setIsPopupOpened] = useState(false);
     return (
+        
+        
         <Subscribe to={[OplogFilterContainer, OplogContainer]}>
             {(filters:OplogFilterContainer, oplog: OplogContainer) => (
                 <form onSubmit={(e: React.FormEvent) => {e.preventDefault(); oplog.reloadList()}}>
@@ -21,7 +25,11 @@ export function OplogFilters() {
                     <ButtonsGroup className="oplog-filters-buttons-group">
                         <ActionButton label="Find" type='submit'  />
                         <ActionButton label="Save filter" onClick={filters.saveCurrentFilterToFavourites} type='button' />
+                        <ActionButton label="Show favourites" onClick={() => setIsPopupOpened(true)} type='button' />
                     </ButtonsGroup>
+                    <PopupHost isOpened={isPopupOpened}>
+                        <div>Sample popup content</div>
+                    </PopupHost>
                 </form>
             )}
         </Subscribe>
