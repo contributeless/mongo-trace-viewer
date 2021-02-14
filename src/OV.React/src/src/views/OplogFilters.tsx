@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Subscribe } from "unstated";
 import { OplogContainer } from "../state/OplogContainer";
 import { OplogFilterContainer } from "../state/OplogFilterContainer";
+import { FavouriteFiltersList } from "./FavouriteFiltersList";
 import { ActionButton } from "./form/ActionButton";
 import { ButtonsGroup } from "./form/ButtonsGroup";
 import { InputGroup } from "./form/InputGroup";
@@ -27,8 +28,12 @@ export function OplogFilters() {
                         <ActionButton label="Save filter" onClick={filters.saveCurrentFilterToFavourites} type='button' />
                         <ActionButton label="Show favourites" onClick={() => setIsPopupOpened(true)} type='button' />
                     </ButtonsGroup>
-                    <Modal isOpened={true} onClose={() => setIsPopupOpened(false)}>
-                        <div>Sample popup content</div>
+                    <Modal isOpened={isPopupOpened} onClose={() => setIsPopupOpened(false)}>
+                        <div className="favourite-filter__popup-container">
+                            <h1>Favourite filters</h1>
+                            <FavouriteFiltersList model={({items: filters.state.favouriteFilters})}></FavouriteFiltersList>
+                        </div>
+                        
                     </Modal>
                 </form>
             )}
