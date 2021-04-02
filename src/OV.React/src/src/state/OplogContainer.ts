@@ -10,7 +10,8 @@ export interface OplogContainerState {
     pageSize: number,
     isNewItemsPresentCheckRunning: boolean;
     isNewItemsPresent: boolean;
-    isNextPageLoadingRunning: boolean
+    isNextPageLoadingRunning: boolean,
+    isLoadMoreAvailable: boolean
 }
 
 export enum ListAction {
@@ -25,7 +26,8 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
         pageSize: 10,
         isNewItemsPresentCheckRunning: false,
         isNewItemsPresent: false,
-        isNextPageLoadingRunning: false
+        isNextPageLoadingRunning: false,
+        isLoadMoreAvailable: false
     };
 
     newItemsInterval: NodeJS.Timeout | null = null;
@@ -45,7 +47,7 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
             pageSize: size
         });
 
-        await this.reloadList(null, ListAction.replace);
+        await this.reloadList(null, ListAction.replace, null, false, false, true);
     }
 
     getPageSize = () => {
@@ -71,7 +73,7 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
             await this.setState({
                 isNextPageLoadingRunning: true
             })
-            await this.reloadList(minTs, ListAction.addAfter, null, false, true);
+            await this.reloadList(minTs, ListAction.addAfter, null, false, true, true);
         }
         finally{
             await this.setState({
@@ -150,21 +152,29 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
     }
 
     startNewSearch = () => {
-        return this.reloadList(null, ListAction.replace, null, true)
+        return this.reloadList(null, ListAction.replace, null, true, false, true);
     }
 
     reloadList = async (maxTimestamp?: string | null, 
         action: ListAction = ListAction.replace, 
         minTimestamp?: string | null, 
         applySearchFilter: boolean = false, 
-        skipLoadersChange: boolean = false) => {
+        skipLoadersChange: boolean = false,
+        checkLoadMoreAvailable: boolean = false) => {
         
         if(applySearchFilter){
             await this.filterContainer.applySearchFilter();
         }
         
-        
-        const oplog = await this.fetchOplog(maxTimestamp ?? null, minTimestamp ?? null, this.state.pageSize, skipLoadersChange);
+        const pageSize = checkLoadMoreAvailable ? this.state.pageSize + 1 : this.state.pageSize;
+
+        const oplog = await this.fetchOplog(maxTimestamp ?? null, minTimestamp ?? null, pageSize, skipLoadersChange);
+
+        if(checkLoadMoreAvailable){
+            await this.setState({
+                isLoadMoreAvailable: oplog.items?.length > this.state.pageSize
+            })
+        }
 
         await this.mergeOplog(oplog, action);
         

@@ -19,7 +19,7 @@ export class OplogList extends React.Component<{}, {}> {
                                 selectedCollection={filter.searchFilter.collection} />)}
                         </div>
 
-                        {!!oplog.state.items.length && !oplog.state.isNextPageLoadingRunning && <div className="load-more-btn__wrapper">
+                        {!!oplog.state.items.length && !oplog.state.isNextPageLoadingRunning && oplog.state.isLoadMoreAvailable && <div className="load-more-btn__wrapper">
                             <ActionButton onClick={oplog.loadNextPage} label="Load more" type="button" />
                         </div>}
                         {oplog.state.isNextPageLoadingRunning && <div className="items-inline-loader__wrapper">
