@@ -107,6 +107,7 @@ h2
     margin-top: 0;
 .oplog__filters
    margin-bottom: 1rem
+   position relative
 
 .oplog-filters-group
    display: flex
@@ -135,3 +136,30 @@ h2
 .favourite-filter__popup-container
    h1
       margin-bottom: 1rem
+
+
+.oplog-filters__find-btn-diff:before
+    content: "\0021";
+    position: absolute;
+    top: -4px;
+    right: 25px;
+    z-index: 100;
+    font-size: 1.6rem;
+    color: #f79128;
+    font-weight: bold;
+
+.oplog-filters__find-btn-wrapper
+   display: inline-block
+   position relative
+
+.oplog__list .oplog__item:last-of-type 
+    border-bottom: none;
+.load-more-btn__wrapper
+   display: flex;
+   justify-content: center;
+   flex-direction: row;
+   height: 50px
+.items-inline-loader__wrapper
+   display: flex
+   flex-direction: column
+   align-items: center

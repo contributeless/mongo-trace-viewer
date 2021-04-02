@@ -9,6 +9,11 @@ export interface TooltipProps {
 }
 
 export function Tooltip(props: TooltipProps) {
+
+    if(props.disabled){
+       return props.children;
+    }
+
     return <Popup
         trigger={props.children}
         position={['top left', 'top right']}

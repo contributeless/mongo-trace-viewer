@@ -1,5 +1,6 @@
 import { OplogFilterModel } from "../models/OplogFilterModel";
 import { DatabasePrefillModel } from "../models/PrefillResponse";
+import { FavouriteFilterService } from "../services/FavouriteFilterService";
 import { OplogService } from "../services/OplogService";
 import { SelectItem } from "../views/form/Select";
 import { BaseContainer } from "./BaseContainer";
@@ -7,6 +8,7 @@ import { ServiceContainer } from "./ServiceContainer";
 
 export interface OplogFilterContainerState {
     currentFilter: OplogFilterModel;
+    searchFilter: OplogFilterModel;
     favouriteFilters: OplogFilterModel[];
     databaseOptions: DatabasePrefillModel[];
 }
@@ -14,6 +16,12 @@ export interface OplogFilterContainerState {
 export class OplogFilterContainer extends BaseContainer<OplogFilterContainerState> {
     state: OplogFilterContainerState = {
         currentFilter: {
+            collection: "",
+            database: "",
+            recordId: "",
+            filterId: ""
+        },
+        searchFilter: {
             collection: "",
             database: "",
             recordId: "",
@@ -29,11 +37,35 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
 
     initialize = async (): Promise<void> => {
         const prefillResponse = await this.makeRequest(() => OplogService.prefill());
-        
+        const favouriteFilters = FavouriteFilterService.loadFilters();
+
         await this.setState({
-            databaseOptions: prefillResponse.databases
+            databaseOptions: prefillResponse.databases,
+            favouriteFilters: favouriteFilters ?? []
         });
     };
+
+    applySearchFilter = () => {
+        return this.setState({
+            currentFilter: {
+                ...this.searchFilter
+            }
+        })
+    }
+
+    isSearchFilterFromFavourites = () => {
+        return !!this.state.favouriteFilters.find(x => x.filterId === this.searchFilter.filterId);
+    }
+
+    isSearchAndCurrentFilterTheSame = () => {
+        return this.searchFilter.collection === this.currentFilter.collection
+        && this.searchFilter.database === this.currentFilter.database
+        && this.searchFilter.recordId === this.currentFilter.recordId
+    }
+
+    synchronizeFavouriteFiltersWithStorage = () => {
+        FavouriteFilterService.saveFilters(this.state.favouriteFilters);
+    }
 
     getDatabaseOptions = (): SelectItem[] => {
         return this.state.databaseOptions.map(x => ({
@@ -43,12 +75,12 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
     }
 
     getCollectionOptions = (): SelectItem[] => {
-        if (!this.currentFilter.database) {
+        if (!this.searchFilter.database) {
             return [];
         }
 
         return this.state.databaseOptions
-            .filter(x => x.database === this.currentFilter.database)
+            .filter(x => x.database === this.searchFilter.database)
             .flatMap(x => x.collections.map(coll => ({ name: coll, value: coll })))
             .sort((a, b) => a.name < b.name ? -1 : (a.name > b.name ? 1 : 0));
     }
@@ -57,31 +89,51 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
         return this.state.currentFilter;
     }
 
-    setDatabase = (value: string) => {
+    get searchFilter(): OplogFilterModel {
+        return this.state.searchFilter;
+    }
+
+    private onSearchFilterChange = () => {
         return this.setState({
-            currentFilter: {
-                ...this.state.currentFilter,
-                database: value
+            searchFilter: {
+                ...this.state.searchFilter,
+                filterId: ""
             }
         })
     }
 
-    setCollection = (value: string) => {
-        return this.setState({
-            currentFilter: {
-                ...this.state.currentFilter,
-                collection: value
+    setDatabase = async (value: string) => {
+        await this.setState({
+            searchFilter: {
+                ...this.state.searchFilter,
+                database: value,
+                collection: "",
+                recordId: ""
             }
-        })
+        });
+
+        await this.onSearchFilterChange();
     }
 
-    setRecordId = (value: string) => {
-        return this.setState({
-            currentFilter: {
-                ...this.state.currentFilter,
+    setCollection = async (value: string) => {
+        await this.setState({
+            searchFilter: {
+                ...this.state.searchFilter,
+                collection: value,
+                recordId: ""
+            }
+        })
+        await this.onSearchFilterChange();
+    }
+
+    setRecordId = async (value: string) => {
+        await this.setState({
+            searchFilter: {
+                ...this.state.searchFilter,
                 recordId: value
             }
         })
+        await this.onSearchFilterChange();
     }
 
     generateFilterId = () => {
@@ -91,14 +143,41 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
         });
     }
 
-    saveCurrentFilterToFavourites = () => {
-        const filterId = this.currentFilter.filterId ?? this.generateFilterId();
+    toggleFavouriteFilter = async () => {
+        if (this.isSearchFilterFromFavourites()) {
+            await this.deleteFavouriteFilter(this.searchFilter.filterId);
+        } else {
+            const filterId = this.searchFilter.filterId || this.generateFilterId();
 
-        return this.setState({
-            favouriteFilters: [...this.state.favouriteFilters, {
-                ...this.currentFilter,
-                filterId
-            }]
+            await this.setState({
+                favouriteFilters: [...this.state.favouriteFilters, {
+                    ...this.searchFilter,
+                    filterId
+                }],
+                searchFilter: {
+                    ...this.searchFilter,
+                    filterId
+                }
+            });
+
+            this.synchronizeFavouriteFiltersWithStorage();
+        }
+    }
+
+    deleteFavouriteFilter = async (filterId: string) => {
+        await this.setState({
+            favouriteFilters: [...this.state.favouriteFilters.filter(x => x.filterId !== filterId)]
         })
+
+        this.synchronizeFavouriteFiltersWithStorage();
+    }
+
+    setSearchFilterFromFavourites = async (filterId: string) => {
+        const filter = this.state.favouriteFilters.find(x => x.filterId === filterId);
+        if(filter){
+            await this.setState({
+                searchFilter: {...filter}
+            })
+        }
     }
   }

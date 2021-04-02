@@ -45,13 +45,13 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
         let actionString = null;
 
         if (operationInfo.operationType === OplogOperationType.insert) {
-            actionString = <>Record with id <span className={`oplog-operation__entityid ${selectedEntityIdClass ?? ""}`}>{operationInfo.entityId}</span> created</>;
+            actionString = <>Record with id <span className={`oplog-operation__entityid ${selectedEntityIdClass ?? ""}`}>{(operationInfo.entityId as any).id || operationInfo.entityId}</span> created</>;
         }
         if (operationInfo.operationType === OplogOperationType.update) {
-            actionString = <>Record with id <span className={`oplog-operation__entityid ${selectedEntityIdClass ?? ""}`}>{operationInfo.entityId}</span> updated</>;
+            actionString = <>Record with id <span className={`oplog-operation__entityid ${selectedEntityIdClass ?? ""}`}>{(operationInfo.entityId as any).id || operationInfo.entityId}</span> updated</>;
         }
         if (operationInfo.operationType === OplogOperationType.delete) {
-            actionString = <>Record with id <span className={`oplog-operation__entityid ${selectedEntityIdClass ?? ""}`}>{operationInfo.entityId}</span> deleted</>;
+            actionString = <>Record with id <span className={`oplog-operation__entityid ${selectedEntityIdClass ?? ""}`}>{(operationInfo.entityId as any).id ||operationInfo.entityId}</span> deleted</>;
         }
 
         let collectionClass = null;
@@ -110,6 +110,7 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
 
     createEntryView = (entry: OplogEntry) => {
         const actionDate = new Date(entry.actionDateTime);
+        
         return <div className="oplog__item">
             <div className="oplog__item-header">
                 <div className="oplog__item-header-main-info">
