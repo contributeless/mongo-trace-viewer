@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { CollectionAggregationOptions, ObjectID, Timestamp } from 'mongodb';
+import { ConsoleTransportOptions } from 'winston/lib/winston/transports';
 import { ChildOplogEntryEntity, OplogEntryEntity, OplogEntryEntityBase, OplogEntryOperation, OplogEntryTransactionOperation } from '../Entities/OplogEntryEntity';
 import { OplogChildEntryModel, OplogEntryModel, OplogEntryModelBase } from '../models/OplogEntryModel';
 import { OplogFilterModel } from '../models/OplogFilterModel';
@@ -19,6 +20,14 @@ class IndexController {
       }
 
       const mongoClient = ResponseUtils.getMongoConnection(res);
+
+      const maxDateFilter = !!filter.endDate ?
+        { $lte: new Date(filter.endDate) }
+        : null;
+
+      const minDateFilter = !!filter.startDate ?
+        { $gte: new Date(filter.startDate) }
+        : null;
 
       const maxTsFilter = !!filter.maxTimestamp ? {
         ts: {$lt : Timestamp.fromString(filter.maxTimestamp)}
@@ -69,10 +78,20 @@ class IndexController {
       const orderByClause = {};
       orderByClause[paging.orderBy] = paging.ascending ? 1 : -1;
 
+      console.log(JSON.stringify({
+        $and: [
+          {...(maxTsFilter ?? {}), ...(minTsFilter ?? {})},
+          {...(minDateFilter && maxDateFilter ? {wall: {...(minDateFilter ?? {}), ...(maxDateFilter ?? {})}} : {})},
+          (!!collectionFilter ? collectionFilter : databaseFilter) ?? {},
+          recordIdFilter ?? {},
+        ]
+      }))
+
       const result: OplogEntryEntity[] = await mongoClient.db("local").collection<OplogEntryEntity>('oplog.rs').aggregate([{
         $match: {
           $and: [
             {...(maxTsFilter ?? {}), ...(minTsFilter ?? {})},
+            {...(minDateFilter || maxDateFilter ? {wall: {...(minDateFilter ?? {}), ...(maxDateFilter ?? {})}} : {})},
             (!!collectionFilter ? collectionFilter : databaseFilter) ?? {},
             recordIdFilter ?? {},
           ]

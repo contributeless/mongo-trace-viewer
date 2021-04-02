@@ -3,4 +3,6 @@ export interface OplogFilterModel {
     collection: string | "";
     recordId: string | "";
     filterId: string | "";
+    startDate: Date | null;
+    endDate: Date | null;
 }

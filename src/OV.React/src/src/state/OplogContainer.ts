@@ -27,6 +27,7 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
         isNewItemsPresent: false,
         isNextPageLoadingRunning: false
     };
+
     newItemsInterval: NodeJS.Timeout | null = null;
     filterContainer: OplogFilterContainer;
 
@@ -86,6 +87,8 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
             database: currentFilter.database || null,
             collection: currentFilter.collection || null,
             recordId: currentFilter.recordId || null,
+            startDate: currentFilter.startDate || null,
+            endDate: currentFilter.endDate || null,
             maxTimestamp: maxTimestamp ?? null,
             minTimestamp: minTimestamp ?? null,
             paging: {
@@ -150,7 +153,11 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
         return this.reloadList(null, ListAction.replace, null, true)
     }
 
-    reloadList = async (maxTimestamp?: string | null, action: ListAction = ListAction.replace, minTimestamp?: string | null, applySearchFilter: boolean = false, skipLoadersChange: boolean = false) => {
+    reloadList = async (maxTimestamp?: string | null, 
+        action: ListAction = ListAction.replace, 
+        minTimestamp?: string | null, 
+        applySearchFilter: boolean = false, 
+        skipLoadersChange: boolean = false) => {
         
         if(applySearchFilter){
             await this.filterContainer.applySearchFilter();

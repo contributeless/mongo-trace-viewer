@@ -3,12 +3,12 @@ import React from "react";
 import "./textInput.styl"
 
 export interface TextInputProps {
-    name: string;
     onChange: (value: string) => void;
+    name: string;
     id?: string;
     value: string;
-    label: string;
     type?: string;
+    label: string;
     className?: string;
 }
 

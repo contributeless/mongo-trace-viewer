@@ -19,13 +19,17 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
             collection: "",
             database: "",
             recordId: "",
-            filterId: ""
+            filterId: "",
+            startDate: null,
+            endDate: null
         },
         searchFilter: {
             collection: "",
             database: "",
             recordId: "",
-            filterId: ""
+            filterId: "",
+            startDate: null,
+            endDate: null
         },
         favouriteFilters: [],
         databaseOptions: []
@@ -37,8 +41,15 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
 
     initialize = async (): Promise<void> => {
         const prefillResponse = await this.makeRequest(() => OplogService.prefill());
-        const favouriteFilters = FavouriteFilterService.loadFilters();
-
+        const favouriteFilters = FavouriteFilterService.loadFilters()
+        ?.map(x => {
+            return {
+                ...x,
+                startDate: x.startDate ? new Date(x.startDate) : null,
+                endDate: x.endDate ? new Date(x.endDate) : null
+            }
+        });
+        
         await this.setState({
             databaseOptions: prefillResponse.databases,
             favouriteFilters: favouriteFilters ?? []
@@ -131,6 +142,26 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
             searchFilter: {
                 ...this.state.searchFilter,
                 recordId: value
+            }
+        })
+        await this.onSearchFilterChange();
+    }
+
+    setStartDate = async (value: Date | null) => {
+        await this.setState({
+            searchFilter: {
+                ...this.state.searchFilter,
+                startDate: value
+            }
+        })
+        await this.onSearchFilterChange();
+    }
+    
+    setEndDate = async (value: Date | null) => {
+        await this.setState({
+            searchFilter: {
+                ...this.state.searchFilter,
+                endDate: value
             }
         })
         await this.onSearchFilterChange();

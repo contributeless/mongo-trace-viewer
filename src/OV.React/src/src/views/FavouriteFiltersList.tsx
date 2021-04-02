@@ -42,6 +42,14 @@ export function FavouriteFiltersList(props: FavouriteFiltersListProps) {
             title: "Record id",
             value: x => x.recordId
         },
+        {
+            title: "Min date",
+            value: x => x.startDate?.toLocaleString()
+        },
+        {
+            title: "Max date",
+            value: x => x.endDate?.toLocaleString()
+        },
     ]
     
 
