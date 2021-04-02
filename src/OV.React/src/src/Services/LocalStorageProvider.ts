@@ -1,6 +1,5 @@
 export class LocalStorageProvider {
     public static save(key:string, value: object){
-        console.log("Saved", key, value);
 
         localStorage.setItem(key, JSON.stringify(value));
     }
@@ -15,7 +14,6 @@ export class LocalStorageProvider {
             value = null;
         }
 
-        console.log("Retrieved", key, value);
         return value;
     }
 } 
