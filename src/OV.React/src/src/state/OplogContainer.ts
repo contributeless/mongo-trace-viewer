@@ -1,5 +1,6 @@
 import { OplogEntry } from "../models/OplogEntry";
 import { OplogListResponse } from "../models/OplogListResponse";
+import { FilterService } from "../services/FilterService";
 import { OplogService } from "../services/OplogService";
 import { BaseContainer } from "./BaseContainer";
 import { OplogFilterContainer } from "./OplogFilterContainer";
@@ -39,7 +40,19 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
     }
 
     initialize = async (): Promise<void> => {
-        // await this.reloadList();
+        const pagingOptions = FilterService.loadPagingOptions();
+
+        await this.setState({
+            pageSize: pagingOptions?.pageSize ?? this.state.pageSize
+        })
+
+        this.subscribe(this.onStateChange)
+    };
+
+    onStateChange = ()=> {
+        FilterService.savePagingOptions({
+            pageSize: this.state.pageSize
+        });
     }
 
     setPageSize = async (size: number) => {

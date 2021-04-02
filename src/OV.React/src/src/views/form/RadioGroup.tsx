@@ -14,10 +14,10 @@ export interface RadioGroupProps {
 }
 
 export function RadioGroup(props: RadioGroupProps) {
-    return <div className={`form-input form-radio-group ${props.className ?? ""}`} onChange={e => props.onChange((e.target as any).value)}>
+    return <div className={`form-input form-radio-group ${props.className ?? ""}`} >
         {props.options.map(x =>
             <div className="form-radio-option__container" key={x.value}>
-                <input type="radio" value={x.value} name={props.name} defaultChecked={props.value === x.value} id={`${props.name}_${x.value}`} />
+                <input type="radio" onChange={e => props.onChange((e.target as any).value)} value={x.value} name={props.name} checked={props.value === x.value} id={`${props.name}_${x.value}`} />
                 <label htmlFor={`${props.name}_${x.value}`}>{x.name}</label>
             </div>
         )}

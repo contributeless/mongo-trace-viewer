@@ -29,8 +29,8 @@ const pageSizerOptions: PageSizerOption[] = [
 
 export function SidePanel() {
     return <Subscribe to={[OplogContainer]}>
-        {(oplog: OplogContainer) => (
-            <div className="side-panel__wrapper">
+        {(oplog: OplogContainer) => {
+            return <div className="side-panel__wrapper">
                 <div className="side-panel__container">
                     <Tooltip text={oplog.state.isNewItemsPresent ? "New records present on server. Click to load" : "Click to load new records"}>
                         <div className={`side-panel__changes-detector changes-detector ${oplog.state.isNewItemsPresent ? "changes-detector__new-items-present" : ""} ${oplog.state.isNewItemsPresentCheckRunning ? "changes-detector__check-running" : ""}`} onClick={oplog.loadNewItems}>
@@ -48,6 +48,6 @@ export function SidePanel() {
                     </div>
                 </div>
             </div>
-        )}
+        }}
     </Subscribe>
 }
