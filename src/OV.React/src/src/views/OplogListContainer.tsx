@@ -2,6 +2,7 @@ import * as React from 'react';
 import './oplog.styl'
 import { OplogFilters } from './OplogFilters';
 import { OplogList } from './OplogList';
+import { OplogSettingsPanel } from './OplogSettingsPanel';
 import { SidePanel } from './SidePanel';
 
 export class OplogListContainer extends React.Component<{}, {}> {
@@ -11,6 +12,9 @@ export class OplogListContainer extends React.Component<{}, {}> {
                 <div className="oplog__filters-wrapper">
                     <div className="oplog__container oplog__filters">
                         <OplogFilters />
+                    </div>
+                    <div className="oplog__settings-container">
+                        <OplogSettingsPanel />
                     </div>
                 </div>
 

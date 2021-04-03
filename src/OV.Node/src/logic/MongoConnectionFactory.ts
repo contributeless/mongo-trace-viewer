@@ -1,19 +1,27 @@
 import { MongoClient } from "mongodb";
-
+import MongoConfigStorage from "./MongoConfigStorage"
 class MongoConnectionFactory {
 
-    public isInitialized(): boolean {
-        return true;
+    public async isInitialized(): Promise<boolean> {
+        try{
+            const client = await this.getConnection();
+
+            await client.db("admin").command({ ping: 1 });
+
+            return true;
+        }
+        catch{
+            return false;
+        }
     }
 
     public async getConnection(): Promise<MongoClient> {
-        const uri = "mongodb://localhost:27017/";
+        const config = await MongoConfigStorage.get();
+        const uri = config.connectionString; //"mongodb://localhost:27017/";
 
         const client = new MongoClient(uri);
 
         await client.connect();
-        await client.db("admin").command({ ping: 1 });
-        console.log("Connected successfully to server");
 
         return client;
     }

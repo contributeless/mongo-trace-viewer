@@ -7,7 +7,7 @@ export class ConfigService {
         return HttpUtility.get(HttpUtility.makeUrl("config/status"));
     }
 
-    public static saveConfig(model: MongoConfig){
+    public static saveConfig(model: MongoConfig): Promise<ConfigStatusResponse>{
         return HttpUtility.post(HttpUtility.makeUrl("config/save"), model);
     }
 }

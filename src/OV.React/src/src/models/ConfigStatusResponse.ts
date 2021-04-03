@@ -1,3 +1,5 @@
-export interface ConfigStatusResponse{
-    isConfigured: boolean
+import { SettingsModel } from "./SettingsModel";
+
+export interface ConfigStatusResponse extends SettingsModel {
+    isConfigured: boolean;
 }

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import MongoConfigStorage from '../logic/MongoConfigStorage';
+import MongoConnectionFactory from '../logic/MongoConnectionFactory';
 import { MongoConfig } from '../models/MongoConfig';
 
 class ConfigController {
@@ -8,7 +9,11 @@ class ConfigController {
         const configData: MongoConfig = req.body;
         
         await MongoConfigStorage.save(configData);
-        res.json({});
+
+        res.json({
+          isConfigured: await MongoConnectionFactory.isInitialized(),
+          connectionString: configData?.connectionString
+        });
     } catch (error) {
         next(error);
     }
@@ -19,7 +24,8 @@ class ConfigController {
         const config = await MongoConfigStorage.get();
         
         res.json({
-            isConfigured: !!config && !!config.connectionString
+            isConfigured: await MongoConnectionFactory.isInitialized(),
+            connectionString: config?.connectionString
         });
     } catch (error) {
         next(error);

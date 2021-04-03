@@ -78,15 +78,6 @@ class IndexController {
       const orderByClause = {};
       orderByClause[paging.orderBy] = paging.ascending ? 1 : -1;
 
-      console.log(JSON.stringify({
-        $and: [
-          {...(maxTsFilter ?? {}), ...(minTsFilter ?? {})},
-          {...(minDateFilter && maxDateFilter ? {wall: {...(minDateFilter ?? {}), ...(maxDateFilter ?? {})}} : {})},
-          (!!collectionFilter ? collectionFilter : databaseFilter) ?? {},
-          recordIdFilter ?? {},
-        ]
-      }))
-
       const result: OplogEntryEntity[] = await mongoClient.db("local").collection<OplogEntryEntity>('oplog.rs').aggregate([{
         $match: {
           $and: [

@@ -6,6 +6,7 @@ import { OplogFilterContainer } from './state/OplogFilterContainer';
 import { OplogContainer } from './state/OplogContainer';
 import { Loader } from './views/Loader';
 import { ServiceContainer } from './state/ServiceContainer';
+import { SettingsContainer } from './state/SettingsContainer';
 
 type Props = {
 
@@ -19,10 +20,12 @@ export class App extends React.Component<Props, State> {
     filterContainer: OplogFilterContainer;
     oplogContainer: OplogContainer;
     serviceContainer: ServiceContainer;
+    settingsContainer: SettingsContainer;
     constructor(props: Props){
         super(props);
 
         this.serviceContainer = new ServiceContainer();
+        this.settingsContainer = new SettingsContainer(this.serviceContainer);
         this.filterContainer = new OplogFilterContainer(this.serviceContainer);
         this.oplogContainer = new OplogContainer(this.filterContainer, this.serviceContainer);
         this.state = {
@@ -30,24 +33,22 @@ export class App extends React.Component<Props, State> {
         }
     }
 
-    async componentDidMount(){
-
-        await this.filterContainer.initialize();
-        await this.oplogContainer.initialize();
-
-        const response = await ConfigService.getConfigStatus();
-        this.setState({
-            isDbConnectionConfigured: response.isConfigured,
+    async componentDidMount() {
+        this.settingsContainer.subscribe(async () => {
+            if (this.settingsContainer.isSettingsValid() && !this.settingsContainer.state.isSettingsOpened) {
+                await this.filterContainer.initialize();
+                await this.oplogContainer.initialize();
+            }
         })
+
+        await this.settingsContainer.initialize();
     }
 
     render() {
         return (
-            <Provider inject={[this.filterContainer, this.oplogContainer, this.serviceContainer]}>
+            <Provider inject={[this.filterContainer, this.oplogContainer, this.serviceContainer, this.settingsContainer]}>
                 <>
-                    {/* <div>Is connection string present: {this.state.isDbConnectionConfigured.toString()}</div> */}
                     <OplogListContainer />
-
                     <Subscribe to={[ServiceContainer]}>
                         {(service: ServiceContainer) => (
                             service.isLoadingEnabled() && <Loader />

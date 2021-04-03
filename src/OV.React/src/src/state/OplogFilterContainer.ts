@@ -31,7 +31,7 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
             filterId: "",
             startDate: null,
             endDate: null,
-            showFullTransactionLog: false
+            showFullTransactionLog: true
         },
         favouriteFilters: [],
         databaseOptions: []
@@ -40,7 +40,7 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
     constructor(serviceContainer: ServiceContainer){
         super(serviceContainer);
     }
-
+    
     initialize = async (): Promise<void> => {
         const prefillResponse = await this.makeRequest(() => OplogService.prefill());
         const favouriteFilters = FilterService.loadFavouriteFilters()
