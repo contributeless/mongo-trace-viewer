@@ -15,8 +15,10 @@ export class OplogList extends React.Component<{}, {}> {
                         <div>
                             {!!oplog.state.items.length && oplog.state.items.map((x, index) => <OplogEntryViewer
                                 entry={x} key={index}
-                                selectedRecordId={filter.searchFilter.recordId}
-                                selectedCollection={filter.searchFilter.collection} />)}
+                                selectedRecordId={filter.currentFilter.recordId}
+                                selectedCollection={filter.currentFilter.collection}
+                                showFullOperationLog={filter.currentFilter.showFullTransactionLog}
+                                />)}
                         </div>
 
                         {!!oplog.state.items.length && !oplog.state.isNextPageLoadingRunning && oplog.state.isLoadMoreAvailable && <div className="load-more-btn__wrapper">

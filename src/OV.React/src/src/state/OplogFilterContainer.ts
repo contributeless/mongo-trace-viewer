@@ -21,7 +21,8 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
             recordId: "",
             filterId: "",
             startDate: null,
-            endDate: null
+            endDate: null,
+            showFullTransactionLog: false
         },
         searchFilter: {
             collection: "",
@@ -29,7 +30,8 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
             recordId: "",
             filterId: "",
             startDate: null,
-            endDate: null
+            endDate: null,
+            showFullTransactionLog: false
         },
         favouriteFilters: [],
         databaseOptions: []
@@ -173,6 +175,16 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
             searchFilter: {
                 ...this.state.searchFilter,
                 endDate: value
+            }
+        })
+        await this.onSearchFilterChange();
+    }
+
+    setShowFullTransactionLog = async (value: boolean) => {
+        await this.setState({
+            searchFilter: {
+                ...this.state.searchFilter,
+                showFullTransactionLog: value
             }
         })
         await this.onSearchFilterChange();

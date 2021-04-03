@@ -7,6 +7,7 @@ type OplogEntryProps = {
     entry: OplogEntry;
     selectedRecordId: string;
     selectedCollection: string;
+    showFullOperationLog: boolean;
 };
 type OplogEntryState = {
     isAccordionOpened: boolean;
@@ -69,8 +70,14 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
 
     renderFullOplogOperation = (entry: OplogEntry) => {
         if (!!entry.childEntries && !!entry.childEntries.length) {
+
+            const childEntries = entry.childEntries.filter(x => this.props.showFullOperationLog ||
+                (!this.props.selectedCollection || this.props.selectedCollection === x.collectionName)
+                && (!this.props.selectedRecordId || this.props.selectedRecordId === x.entityId)
+                );
+
             return <div className="oplog-operation__multi-container">
-                {entry.childEntries.map((x, index) => <div className="oplog-operation__multi-container-entry" key={index}>
+                {childEntries.map((x, index) => <div className="oplog-operation__multi-container-entry" key={index}>
                     {this.renderOplogOperation(x)}
                 </div>)}
 

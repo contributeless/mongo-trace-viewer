@@ -13,14 +13,14 @@ export interface DateTimePickerProps {
 }
 
 export function DateTimePicker(props: DateTimePickerProps) {
-    return (<div className="date-time-picker__container">
+    return (<div className="date-time-picker__container form-input form-text">
         {!!props.label && <label htmlFor={props.id ?? props.name}>{props.label}</label>}
         <Datetime value={props.value ?? ""}
             utc={false}
             closeOnClickOutside={true}
             closeOnSelect={true}
             onChange={(momentValue) => typeof momentValue == "string" || !momentValue.isValid() ? null : props.onChange(momentValue.toDate())}
-            className={`form-input form-text ${props.className ?? ""}`}
+            className={`${props.className ?? ""}`}
             initialValue={""}
             input
             inputProps={{
