@@ -1,9 +1,10 @@
 import fs from 'fs';
+import path from 'path';
 import winston from 'winston';
 import winstonDaily from 'winston-daily-rotate-file';
 
 // logs dir
-const logDir = __dirname + '/../logs';
+const logDir = path.join(process.cwd(), "logs");
 
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
@@ -11,7 +12,7 @@ if (!fs.existsSync(logDir)) {
 
 // winston format
 const { combine, timestamp, printf } = winston.format;
-
+ 
 // Define log format
 const logFormat = printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`);
 

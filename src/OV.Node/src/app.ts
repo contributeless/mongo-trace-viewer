@@ -17,7 +17,8 @@ class App {
     this.app = express();
     this.port = process.env.PORT || 3000;
     this.env = process.env.NODE_ENV || 'development';
-    this.app.use(favicon(path.join(__dirname, 'public', 'favicon.png')))
+    this.app.use(favicon(path.join(__dirname, "public/favicon.png")))
+    this.app.use(express.static(path.join(__dirname, '/assets')));
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
     this.app.use('/db', App.asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
@@ -25,6 +26,10 @@ class App {
       await connection.close();
       next();
     }));
+    this.app.get('*', function (request, response) {
+      response.sendFile(path.join(__dirname, "assets/index.html"));
+    });
+    
     this.initializeErrorHandling();
   }
 

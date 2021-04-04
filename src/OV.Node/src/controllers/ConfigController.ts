@@ -27,8 +27,8 @@ class ConfigController {
             isConfigured: await MongoConnectionFactory.isInitialized(),
             connectionString: config?.connectionString
         });
-    } catch (error) {
-        next(error);
+      } catch (error) {
+      next(error);
     }
   };
 }

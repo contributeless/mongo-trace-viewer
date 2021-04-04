@@ -2,13 +2,25 @@
   "name": "mongo-oplog-viewer",
   "version": "1.0.0",
   "description": "",
+  "bin": "build/server.js",
   "main": "src/server.ts",
+  "pkg": {
+    "scripts": "build/**/*.js",
+    "assets": [
+      "build/assets/**/*",
+      "build/public/**/*"
+    ],
+    "outputPath": "dist_bin"
+  },
   "scripts": {
     "start": "npm run build && cross-env NODE_ENV=production node build/server.js",
     "dev": "cross-env NODE_ENV=development nodemon --ignore 'cfg/*.*'",
     "build": "tsc",
+    "postbuild": "npm run copy_assets",
     "lint": "eslint --ignore-path .gitignore --ext .ts src/",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "package": "npm run build && pkg package.json",
+    "copy_assets": "copyfiles --error --up 1 src/assets/*.* build && copyfiles --error --up 1 src/public/*.* build"
   },
   "repository": {
     "type": "git",
@@ -30,7 +42,9 @@
     "@types/express": "^4.17.11",
     "@types/mongodb": "^3.6.3",
     "@types/node": "^14.14.22",
-    "@types/winston": "^2.4.4"
+    "@types/winston": "^2.4.4",
+    "copyfiles": "^2.4.1",
+    "pkg": "^4.5.1"
   },
   "dependencies": {
     "cors": "^2.8.5",

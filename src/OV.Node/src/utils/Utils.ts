@@ -2,17 +2,17 @@ import path from 'path';
 import fs from 'fs';
 import util  from 'util';
 
-export const writeFileAsyncRecursive = async (filename: string, content: string, charset: string) => {
+export const writeFileAsyncRecursive = async (filename: string, content: string) => {
   const exists = util.promisify(fs.exists);
   const writeFile = util.promisify(fs.writeFile);
   const mkdir = util.promisify(fs.mkdir);
   
-  const folders = filename.split("/").slice(0, -1)
+  const folders = filename.split(path.sep).slice(0, -1)
   if (folders.length) {
     const directoriesToCreate = [];
     // create folder path if it doesn't exist
     folders.reduce((last, folder) => {
-      const folderPath = last ? last + "/" + folder : folder;
+      const folderPath = last ? last + path.sep + folder : folder;
       directoriesToCreate.push(folderPath);
       return folderPath
     })
@@ -25,7 +25,10 @@ export const writeFileAsyncRecursive = async (filename: string, content: string,
     }
   }
 
-  writeFile(filename, content, charset)
+  await writeFile(filename, content, {
+    encoding: "utf8",
+    flag: 'w'
+  });
 }
 
 export const isEmpty = (value: any): boolean => {
