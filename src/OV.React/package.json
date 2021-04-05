@@ -15,11 +15,13 @@
   },
   "license": "ISC",
   "dependencies": {
+    "eventemitter3": "^4.0.7",
     "moment": "^2.29.1",
     "react": "^17.0.2",
     "react-datetime": "^3.0.4",
     "react-dom": "^17.0.2",
     "react-json-view": "^1.21.3",
+    "react-toastify": "^7.0.3",
     "reactjs-popup": "^2.0.4",
     "unstated": "^2.1.1"
   },
@@ -32,6 +34,7 @@
     "@babel/preset-react": "^7.13.13",
     "@babel/preset-typescript": "^7.13.0",
     "@svgr/webpack": "^5.5.0",
+    "@types/eventemitter3": "^2.0.2",
     "@types/node": "^14.14.37",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.3",

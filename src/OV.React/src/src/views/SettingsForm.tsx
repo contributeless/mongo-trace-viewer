@@ -24,6 +24,7 @@ export function SettingsForm(props: SettingsFormProps){
     return <form onSubmit={(e: React.FormEvent) => { e.preventDefault(); saveSettings() }} autoComplete="off">
         <InputGroup className="oplog-settings-group">
             <TextInput name="connectionString" onChange={setConnectionString} value={connectionString} label="Mongo connection string:" />
+            <div className="oplog-settings__connection-string-example">For example: mongodb://localhost:27017</div>
         </InputGroup>
         <ButtonsGroup className="oplog-settings-buttons-group">
             <ActionButton label="Save" type='submit' />

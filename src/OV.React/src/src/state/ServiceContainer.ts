@@ -1,4 +1,7 @@
 import { Container } from "unstated";
+import { EventTypes } from "../models/EventTypes";
+import { ServerErrorModel } from "../models/ServerErrorModel";
+import EventHub from "../services/EventHub";
 
 export interface ServiceContainerState {
     loadersCount: number;
@@ -23,5 +26,11 @@ export class ServiceContainer extends Container<ServiceContainerState>{
 
     isLoadingEnabled = () => {
         return this.state.loadersCount > 0;
+    }
+
+    onFetchError = (error: ServerErrorModel) => {
+        EventHub.emit(EventTypes.FETCH_ERROR, error ?? {
+            errors: []
+        } as ServerErrorModel)
     }
 }

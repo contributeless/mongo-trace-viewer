@@ -1,36 +1,31 @@
 import * as React from 'react';
 import { OplogListContainer } from './views/OplogListContainer';
-import { ConfigService } from './services/ConfigService';
 import { Provider, Subscribe } from 'unstated';
 import { OplogFilterContainer } from './state/OplogFilterContainer';
 import { OplogContainer } from './state/OplogContainer';
 import { Loader } from './views/Loader';
 import { ServiceContainer } from './state/ServiceContainer';
 import { SettingsContainer } from './state/SettingsContainer';
+import { ErrorNotificationList } from './views/ErrorNotificationList';
 
-type Props = {
-
-};
-type State = {
-   isDbConnectionConfigured: boolean,
+interface AppProps {
 
 };
+interface AppState  {
+};
 
-export class App extends React.Component<Props, State> {
+export class App extends React.Component<AppProps, AppState> {
     filterContainer: OplogFilterContainer;
     oplogContainer: OplogContainer;
     serviceContainer: ServiceContainer;
     settingsContainer: SettingsContainer;
-    constructor(props: Props){
+    constructor(props: AppProps){
         super(props);
 
         this.serviceContainer = new ServiceContainer();
         this.settingsContainer = new SettingsContainer(this.serviceContainer);
         this.filterContainer = new OplogFilterContainer(this.serviceContainer);
         this.oplogContainer = new OplogContainer(this.filterContainer, this.serviceContainer);
-        this.state = {
-            isDbConnectionConfigured: true,
-        }
     }
 
     async componentDidMount() {
@@ -54,6 +49,7 @@ export class App extends React.Component<Props, State> {
                             service.isLoadingEnabled() && <Loader />
                         )}
                     </Subscribe>
+                    <ErrorNotificationList></ErrorNotificationList>
                 </>
             </Provider>
         );

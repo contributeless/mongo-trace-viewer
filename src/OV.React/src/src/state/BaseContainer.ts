@@ -1,4 +1,5 @@
 import { Container } from "unstated";
+import { ServerErrorModel } from "../models/ServerErrorModel";
 import { ServiceContainer } from "./ServiceContainer";
 
 export class BaseContainer<State extends object> extends Container<State> {
@@ -15,6 +16,10 @@ export class BaseContainer<State extends object> extends Container<State> {
                 await this.serviceContainer.incrementLoadersCount();
             }
             return await func();
+        }
+        catch(error: any){
+            this.serviceContainer.onFetchError(error as ServerErrorModel);
+            throw error;
         }
         finally {
             if(!skipLoadersChange){
