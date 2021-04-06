@@ -131,11 +131,20 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
         }
     }
 
-    setIsNewItemsAvailable = async () => {
+    setNewChangesInterval = () => {
+        this.clearNewChangesInterval();
+        this.newItemsInterval = setInterval(this.setIsNewItemsAvailable, 10000);
+    }
+
+    clearNewChangesInterval = () => {
         if(!!this.newItemsInterval){
             clearInterval(this.newItemsInterval);
             this.newItemsInterval = null;
         }
+    }
+
+    setIsNewItemsAvailable = async () => {
+        this.clearNewChangesInterval();
 
         const descSortedTs = this.state.items.map(x => x.timestamp).sort(function(d1, d2){
             return d2.localeCompare(d1);
@@ -161,7 +170,7 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
             }
         }
 
-        this.newItemsInterval = setInterval(this.setIsNewItemsAvailable, 5000);
+        this.setNewChangesInterval();
     }
 
     startNewSearch = () => {
@@ -191,10 +200,6 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
 
         await this.mergeOplog(oplog, action);
         
-        if(!!this.newItemsInterval){
-            clearInterval(this.newItemsInterval);
-            this.newItemsInterval = null;
-        }
-        this.newItemsInterval = setInterval(this.setIsNewItemsAvailable, 5000);
+        this.setNewChangesInterval();
     }
 }
