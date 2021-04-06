@@ -39,8 +39,11 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
         super(serviceContainer);
     }
     
-    initialize = async (): Promise<void> => {
-        const prefillResponse = await this.makeRequest(() => OplogService.prefill());
+    initialize = async (isConnectionStringPresent: boolean): Promise<void> => {
+        if(isConnectionStringPresent){
+            await this.reloadPrefillInfo();
+        }
+        
         const favouriteFilters = FilterService.loadFavouriteFilters()
         ?.map(x => {
             return {
@@ -53,7 +56,6 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
         const searchFilter = FilterService.loadSearchFilter() ?? this.state.searchFilter;
 
         await this.setState({
-            databaseOptions: prefillResponse.databases,
             favouriteFilters: favouriteFilters ?? [],
             searchFilter: {
                 ...searchFilter, 
@@ -64,6 +66,25 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
 
         this.subscribe(this.onStateChange)
     };
+
+    reloadPrefillInfo = async () => {
+        const prefillResponse = await this.makeRequest(() => OplogService.prefill());
+        let databases: DatabasePrefillModel[] = prefillResponse.databases;
+
+        await this.setState({
+            databaseOptions: databases,
+            searchFilter: {
+                collection: "",
+                database: "",
+                endDate: null,
+                startDate: null,
+                filterId: "",
+                recordId: ""
+            }
+        });
+
+        await this.onSearchFilterChange();
+    }
 
     onStateChange = ()=> {
         FilterService.saveFavouriteFilters(this.state.favouriteFilters);

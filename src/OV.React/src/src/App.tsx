@@ -7,6 +7,8 @@ import { Loader } from './views/Loader';
 import { ServiceContainer } from './state/ServiceContainer';
 import { SettingsContainer } from './state/SettingsContainer';
 import { ErrorNotificationList } from './views/ErrorNotificationList';
+import EventHub from './services/EventHub';
+import { EventTypes } from './models/EventTypes';
 
 interface AppProps {
 
@@ -29,14 +31,13 @@ export class App extends React.Component<AppProps, AppState> {
     }
 
     async componentDidMount() {
-        this.settingsContainer.subscribe(async () => {
-            if (this.settingsContainer.isSettingsValid() && !this.settingsContainer.state.isSettingsOpened) {
-                await this.filterContainer.initialize();
-                await this.oplogContainer.initialize();
-            }
-        })
-
         await this.settingsContainer.initialize();
+        await this.filterContainer.initialize(this.settingsContainer.isSettingsValid());
+        await this.oplogContainer.initialize();
+
+        EventHub.on(EventTypes.CONNECTION_STRING_CHANGED, async () => {
+            await this.filterContainer.reloadPrefillInfo();
+        });
     }
 
     render() {

@@ -1,5 +1,7 @@
+import { EventTypes } from "../models/EventTypes";
 import { SettingsModel } from "../models/SettingsModel";
 import { ConfigService } from "../services/ConfigService";
+import EventHub from "../services/EventHub";
 import { BaseContainer } from "./BaseContainer";
 import { ServiceContainer } from "./ServiceContainer";
 
@@ -55,6 +57,9 @@ export class SettingsContainer extends BaseContainer<SettingsContainerState> {
             connectionString: model.connectionString
         }));
 
+        const isConnectionStringChanged = result.connectionString != this.state.settings.connectionString
+            && result.isConfigured === true;
+
         await this.setState({
             isConfigured: result.isConfigured,
             settings: {
@@ -62,5 +67,10 @@ export class SettingsContainer extends BaseContainer<SettingsContainerState> {
             },
             isSettingsOpened: result.isConfigured === false
         });
+
+        if(isConnectionStringChanged) {
+            EventHub.emit(EventTypes.CONNECTION_STRING_CHANGED, {});
+        }
+        
     }
 }
