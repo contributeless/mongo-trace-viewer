@@ -76,6 +76,7 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
 
         const maxTs = descSortedTs.length ? descSortedTs[0] : null;
         await this.reloadList(null, ListAction.addBefore, maxTs);
+
     }
 
     loadNextPage = async () => {
@@ -211,6 +212,12 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
 
         await this.mergeOplog(oplog, action);
         
+        if(action == ListAction.addAfter || action == ListAction.replace){
+            await this.setState({
+                isNewItemsPresent: false
+            })
+        }
+
         this.setNewChangesInterval();
     }
 }
