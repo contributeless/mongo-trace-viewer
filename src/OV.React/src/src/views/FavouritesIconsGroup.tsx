@@ -27,7 +27,10 @@ export function FavouritesIconsGroup() {
                         <FavouriteFiltersList
                             model={({ items: filters.state.favouriteFilters })}
                             onDelete={filters.deleteFavouriteFilter}
-                            onSelect={filters.setSearchFilterFromFavourites} />
+                            onSelect={(x) => {
+                                setIsPopupOpened(false);
+                                filters.setSearchFilterFromFavourites(x)
+                            }} />
                     </div>
                 </Modal>
             </div>
