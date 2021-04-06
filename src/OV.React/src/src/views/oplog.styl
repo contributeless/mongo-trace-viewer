@@ -68,8 +68,11 @@ h2
     color: #737171e0;
     padding: 0.5rem 0;
 
-.oplog__item-header-toggle i:before
-   content: "+"
+.oplog__item-header-toggle i
+   &:before
+      content: "+"
+   &:hover
+      color:#545454
 
 .oplog__item-header-toggle
     position: absolute;
