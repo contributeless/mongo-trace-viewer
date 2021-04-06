@@ -46,7 +46,7 @@ export class App extends React.Component<AppProps, AppState> {
                     <OplogListContainer />
                     <Subscribe to={[ServiceContainer]}>
                         {(service: ServiceContainer) => (
-                            service.isLoadingEnabled() && <Loader />
+                            <Loader isEnabled={service.isLoadingEnabled()} />
                         )}
                     </Subscribe>
                     <ErrorNotificationList></ErrorNotificationList>
