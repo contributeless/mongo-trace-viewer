@@ -5,6 +5,10 @@ i
 * {
   box-sizing: border-box;
 }
+
+body 
+  margin: 2rem;
+
 h1
    margin: 0;
 h2
@@ -179,3 +183,20 @@ h2
    font-size: 0.7rem
    font-weight: bold
    color: gray
+
+
+@media (max-width: 650px) 
+   .oplog__filters-wrapper
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+   .oplog__settings-container
+      position: relative;
+      display: inline-block;
+      margin-bottom: 1rem;
+   body
+      margin: 0;
+   .oplog__filters-wrapper
+      padding: 0 1rem
+   .oplog__list-wrapper
+      padding: 0 1rem

@@ -10,19 +10,21 @@ export class OplogListContainer extends React.Component<{}, {}> {
         return (
             <div className="oplog__main">
                 <div className="oplog__filters-wrapper">
-                    <div className="oplog__container oplog__filters">
-                        <OplogFilters />
-                    </div>
                     <div className="oplog__settings-container">
                         <OplogSettingsPanel />
                     </div>
+                    <div className="oplog__container oplog__filters">
+                        <OplogFilters />
+                    </div>
+
                 </div>
 
                 <div className="oplog__list-wrapper">
+                    <SidePanel />
                     <div className="oplog__container oplog__list">
                         <OplogList />
                     </div>
-                    <SidePanel />
+
                 </div>
             </div>
         );
