@@ -212,7 +212,7 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
 
         await this.mergeOplog(oplog, action);
         
-        if(action == ListAction.addAfter || action == ListAction.replace){
+        if(action == ListAction.addBefore || action == ListAction.replace){
             await this.setState({
                 isNewItemsPresent: false
             })
