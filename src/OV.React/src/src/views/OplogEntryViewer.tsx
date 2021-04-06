@@ -96,7 +96,7 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
                 );
 
             return <div className="oplog-operation__multi-container">
-                {childEntries.filter((x, index) => index < this.state.loadedChildEntriesCount)
+                {childEntries.sort((x,y) => x.collectionName.localeCompare(y.collectionName)).filter((x, index) => index < this.state.loadedChildEntriesCount)
                     .map((x, index) => <div className="oplog-operation__multi-container-entry" key={index}>
                         {this.renderOplogOperation(x)}
                     </div>)}
