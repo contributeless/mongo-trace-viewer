@@ -17,7 +17,6 @@ export class OplogList extends React.Component<{}, {}> {
                                 entry={x} key={index}
                                 selectedRecordId={filter.currentFilter.recordId}
                                 selectedCollection={filter.currentFilter.collection}
-                                showFullOperationLog={filter.currentFilter.showFullTransactionLog}
                             />)}
                             {!oplog.state.items.length && <span className="oplog-list__empty">No records found</span>}
                         </div>

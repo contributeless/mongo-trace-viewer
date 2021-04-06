@@ -49,11 +49,7 @@ export function FavouriteFiltersList(props: FavouriteFiltersListProps) {
         {
             title: "Max date",
             value: x => x.endDate?.toLocaleString()
-        },
-        {
-            title: "Show full transaction log",
-            value: x => x.showFullTransactionLog ? "Yes" : "No"
-        },
+        }
     ]
     
 

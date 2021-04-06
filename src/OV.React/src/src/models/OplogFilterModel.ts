@@ -5,5 +5,4 @@ export interface OplogFilterModel {
     filterId: string | "";
     startDate: Date | null;
     endDate: Date | null;
-    showFullTransactionLog: boolean;
 }

@@ -29,7 +29,6 @@ export function OplogFilters() {
                             <TextInput name="recordId" onChange={filters.setRecordId} value={filters.searchFilter.recordId} label="Record id:" />
                             <DateTimePicker name="startDate" onChange={filters.setStartDate} value={filters.searchFilter.startDate} label={"Min date:"}></DateTimePicker>
                             <DateTimePicker name="endDate" onChange={filters.setEndDate} value={filters.searchFilter.endDate} label={"Max date:"}></DateTimePicker>
-                            <Checkbox name="showFullTransactionLog" onChange={filters.setShowFullTransactionLog}  value={filters.searchFilter.showFullTransactionLog} label={"Show full transaction log:"} ></Checkbox>
                         </InputGroup>
                         <ButtonsGroup className="oplog-filters-buttons-group">
                             <Tooltip disabled={filters.isSearchAndCurrentFilterTheSame()} text={"The filter has been changed. Click to apply"} >

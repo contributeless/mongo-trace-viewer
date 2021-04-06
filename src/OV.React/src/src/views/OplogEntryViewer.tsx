@@ -8,11 +8,11 @@ type OplogEntryProps = {
     entry: OplogEntry;
     selectedRecordId: string;
     selectedCollection: string;
-    showFullOperationLog: boolean;
 };
 type OplogEntryState = {
     isAccordionOpened: boolean;
-    loadedChildEntriesCount: number
+    loadedChildEntriesCount: number;
+    isAllTransactionOperationsShouldBeShown : boolean
 };
 
 export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntryState> {
@@ -21,17 +21,18 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
         super(props);
         this.state = {
             isAccordionOpened: false,
-            loadedChildEntriesCount: 10
+            loadedChildEntriesCount: 10,
+            isAllTransactionOperationsShouldBeShown: false
         }
     }
 
     shouldComponentUpdate(nextProps: OplogEntryProps, nextState: OplogEntryState) {
-        return nextProps.showFullOperationLog !== this.props.showFullOperationLog
-         || nextProps.selectedCollection !== this.props.selectedCollection
+        return nextProps.selectedCollection !== this.props.selectedCollection
          || nextProps.selectedRecordId !== this.props.selectedRecordId
          || nextProps.entry !== this.props.entry
          || nextState.isAccordionOpened !== this.state.isAccordionOpened
          || nextState.loadedChildEntriesCount !== this.state.loadedChildEntriesCount
+         || nextState.isAllTransactionOperationsShouldBeShown !== this.state.isAllTransactionOperationsShouldBeShown
     }
 
     renderOplogOperation = (operationInfo: OplogEntryModelBase) => {
@@ -89,7 +90,7 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
     renderFullOplogOperation = (entry: OplogEntry) => {
         if (!!entry.childEntries && !!entry.childEntries.length) {
 
-            const childEntries = entry.childEntries.filter(x => this.props.showFullOperationLog ||
+            const childEntries = entry.childEntries.filter(x => this.state.isAllTransactionOperationsShouldBeShown ||
                 (!this.props.selectedCollection || this.props.selectedCollection === x.collectionName)
                 && (!this.props.selectedRecordId || this.props.selectedRecordId === x.entityId)
                 );
@@ -143,6 +144,12 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
         })
     }
 
+    toggleAllOperations = () => {
+        this.setState({
+            isAllTransactionOperationsShouldBeShown: !this.state.isAllTransactionOperationsShouldBeShown
+        })
+    }
+
     createEntryView = (entry: OplogEntry) => {
         const actionDate = new Date(entry.actionDateTime);
         
@@ -160,7 +167,15 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
                 </div>
             </div>
             {!!this.state.isAccordionOpened && <div className="oplog__item-content">
-                <div className="oplog__item-operation oplog-operation__container">{this.renderFullOplogOperation(entry)}</div>
+                <div className="oplog__item-operation oplog-operation__container">
+                    <ActionButton label={this.state.isAllTransactionOperationsShouldBeShown
+                        ? "Show only filtered operations"
+                        : "Show all transaction operations"}
+                        onClick={this.toggleAllOperations}
+                        type="button"
+                        className="oplog-operation__show-all-toggle" />
+                    {this.renderFullOplogOperation(entry)}
+                </div>
             </div>}
         </div>;
     }
