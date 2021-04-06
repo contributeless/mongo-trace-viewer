@@ -1,104 +1,133 @@
 import { NextFunction, Request, Response } from 'express';
 import { CollectionAggregationOptions, ObjectID, Timestamp } from 'mongodb';
-import { ConsoleTransportOptions } from 'winston/lib/winston/transports';
 import { ChildOplogEntryEntity, OplogEntryEntity, OplogEntryEntityBase, OplogEntryOperation, OplogEntryTransactionOperation } from '../Entities/OplogEntryEntity';
 import { OplogChildEntryModel, OplogEntryModel, OplogEntryModelBase } from '../models/OplogEntryModel';
 import { OplogFilterModel } from '../models/OplogFilterModel';
 import { OplogOperationType } from '../models/OplogOperationType';
+import { PagingModel } from '../models/PagingModel';
 import ResponseUtils from '../utils/ResponseUtils';
 
 class IndexController {
+
+  private getDefaultPaging = () =>  {
+    return {
+      ascending: true,
+      orderBy: "ts",
+      pageNumber: 1,
+      pageSize: 10,
+    } as PagingModel;
+  }
+
+  private getMinDateFilter = (filter: OplogFilterModel) => {
+    return !!filter.startDate ?
+      {
+        wall: {
+          $gte: new Date(filter.startDate)
+        }
+      }
+      : null;
+  }
+  
+  private getMaxDateFilter = (filter: OplogFilterModel) => {
+    return !!filter.endDate ?
+      {
+        wall: {
+          $lte: new Date(filter.endDate)
+        }
+      }
+      : null;
+  }
+
+  
+  private getMinTSFilter = (filter: OplogFilterModel) => {
+    return !!filter.minTimestamp ? {
+      ts: {
+        $gt : Timestamp.fromString(filter.minTimestamp)
+      }
+    }: null;
+  }
+
+  private getMaxTSFilter = (filter: OplogFilterModel) => {
+    return !!filter.maxTimestamp ? {
+      ts: {
+        $lt: Timestamp.fromString(filter.maxTimestamp)
+      }
+    } : null;
+  }
+
+  private getOrderByClause = (paging: PagingModel) => {
+    const orderByClause = {};
+    orderByClause[paging.orderBy] = paging.ascending ? 1 : -1;
+
+    return orderByClause;
+  }
+
   public index = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const filter: OplogFilterModel = req.body;
 
-      const paging = filter.paging ?? {
-        ascending: true,
-        orderBy: "ts",
-        pageNumber: 1,
-        pageSize: 10
-      }
+      const paging = filter.paging ?? this.getDefaultPaging();
 
       const mongoClient = ResponseUtils.getMongoConnection(res);
 
-      const maxDateFilter = !!filter.endDate ?
-        { $lte: new Date(filter.endDate) }
-        : null;
 
-      const minDateFilter = !!filter.startDate ?
-        { $gte: new Date(filter.startDate) }
-        : null;
+      let namespaceFilter = null;
 
-      const maxTsFilter = !!filter.maxTimestamp ? {
-        ts: {$lt : Timestamp.fromString(filter.maxTimestamp)}
-      }: null;
-
-      const minTsFilter = !!filter.minTimestamp ? {
-        ts: {$gt : Timestamp.fromString(filter.minTimestamp)}
-      }: null;
-
-      const databaseFilter = !!filter.database ? {
-        $or: [
-          { ns: { $regex: new RegExp(`^${filter.database}\\..+`) } },
-          {
-            ns: "admin.$cmd",
-            "o.applyOps.ns": { $regex: new RegExp(`^${filter.database}\..+`) }
-          }
-        ]
-      } : null;
-
-      const collectionFilter = !!filter.database && !!filter.collection ? {
-        $or: [
-          { ns: `${filter.database}.${filter.collection}` },
-          {
-            ns: "admin.$cmd",
-            "o.applyOps.ns": `${filter.database}.${filter.collection}`
-          }
-        ]
-      } : null;
+      if (!!filter.database && !!filter.collection) {
+        namespaceFilter = `${filter.database}.${filter.collection}`;
+      } else if (!!filter.database) {
+        namespaceFilter = { $regex: new RegExp(`^${filter.database}\..+`) };
+      }
 
       const id = !!filter.recordId ? (ObjectID.isValid(filter.recordId) ? new ObjectID(filter.recordId) : filter.recordId) : null;
       
-      const recordIdFilter = !!filter.recordId ? {
-        $or: [
-          { "o2._id": id },
-          { "o._id": id },
-          {
-            ns: "admin.$cmd",
-            "o.applyOps.o2._id": id
-          },
-          {
-            ns: "admin.$cmd",
-            "o.applyOps.o._id": id
-          },
+
+      const recordIdNamespaceFilter = {
+        $and: [
+          namespaceFilter ? { ns: namespaceFilter } : {},
+          id ? {
+            $or: [
+              { "o2._id": id },
+              { "o._id": id },
+            ]
+          } : {}
         ]
-      } : null;
+      }
 
-
-      const orderByClause = {};
-      orderByClause[paging.orderBy] = paging.ascending ? 1 : -1;
+      const recordIdNamespaceWithInnerEntriesFilter = {
+        $or: [
+          recordIdNamespaceFilter,
+          {
+            ns: "admin.$cmd",
+            "o.applyOps": {
+              "$elemMatch": recordIdNamespaceFilter
+            },
+          }
+        ]
+      };
 
       const result: OplogEntryEntity[] = await mongoClient.db("local").collection<OplogEntryEntity>('oplog.rs').aggregate([{
         $match: {
           $and: [
-            {...(maxTsFilter ?? {}), ...(minTsFilter ?? {})},
-            {...(minDateFilter || maxDateFilter ? {wall: {...(minDateFilter ?? {}), ...(maxDateFilter ?? {})}} : {})},
-            (!!collectionFilter ? collectionFilter : databaseFilter) ?? {},
-            recordIdFilter ?? {},
+            {...(this.getMinTSFilter(filter))},
+            {...(this.getMaxTSFilter(filter))},
+            {...(this.getMinDateFilter(filter))},
+            {...(this.getMaxDateFilter(filter))},
+            recordIdNamespaceWithInnerEntriesFilter ?? {},
           ]
         }
       },
       {
-        $sort: orderByClause
+        $sort: this.getOrderByClause(paging)
       },
       {
         $skip: (paging.pageNumber - 1) * paging.pageSize,
-        
       },
       {
         $limit: paging.pageSize,
       }
-      ], {
+      ], 
+      {
         allowDiskUse: true
       } as CollectionAggregationOptions).toArray()
 

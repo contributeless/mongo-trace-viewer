@@ -88,6 +88,9 @@ export class OplogFilterContainer extends BaseContainer<OplogFilterContainerStat
         return this.searchFilter.collection === this.currentFilter.collection
         && this.searchFilter.database === this.currentFilter.database
         && this.searchFilter.recordId === this.currentFilter.recordId
+        && this.searchFilter.startDate === this.currentFilter.startDate
+        && this.searchFilter.endDate === this.currentFilter.endDate
+        && this.searchFilter.showFullTransactionLog === this.currentFilter.showFullTransactionLog
     }
 
 
