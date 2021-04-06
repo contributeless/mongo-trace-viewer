@@ -122,11 +122,11 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
             })
         } else if(action == ListAction.addAfter){
             await this.setState({
-                items: [...this.state.items, ...response.items]
+                items: this.state.items.concat(response.items)
             })
         } else if(action == ListAction.addBefore){
             await this.setState({
-                items: [...response.items, ...this.state.items]
+                items: response.items.concat(this.state.items)
             })
         }
     }

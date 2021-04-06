@@ -2,6 +2,7 @@ import React from "react";
 import ReactJson from "react-json-view";
 import { OplogEntry, OplogEntryModelBase } from "../models/OplogEntry";
 import { OplogOperationType } from "../models/OplogOperationType";
+import { ActionButton } from "./form/ActionButton";
 
 type OplogEntryProps = {
     entry: OplogEntry;
@@ -11,6 +12,7 @@ type OplogEntryProps = {
 };
 type OplogEntryState = {
     isAccordionOpened: boolean;
+    loadedChildEntriesCount: number
 };
 
 export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntryState> {
@@ -18,8 +20,18 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
     constructor(props: OplogEntryProps) {
         super(props);
         this.state = {
-            isAccordionOpened: false
+            isAccordionOpened: false,
+            loadedChildEntriesCount: 10
         }
+    }
+
+    shouldComponentUpdate(nextProps: OplogEntryProps, nextState: OplogEntryState) {
+        return nextProps.showFullOperationLog !== this.props.showFullOperationLog
+         || nextProps.selectedCollection !== this.props.selectedCollection
+         || nextProps.selectedRecordId !== this.props.selectedRecordId
+         || nextProps.entry !== this.props.entry
+         || nextState.isAccordionOpened !== this.state.isAccordionOpened
+         || nextState.loadedChildEntriesCount !== this.state.loadedChildEntriesCount
     }
 
     renderOplogOperation = (operationInfo: OplogEntryModelBase) => {
@@ -68,6 +80,12 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
         </div>
     } 
 
+    loadMoreChildEntries = () => {
+        this.setState({
+            loadedChildEntriesCount: this.state.loadedChildEntriesCount + 10
+        })
+    }
+
     renderFullOplogOperation = (entry: OplogEntry) => {
         if (!!entry.childEntries && !!entry.childEntries.length) {
 
@@ -77,10 +95,19 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
                 );
 
             return <div className="oplog-operation__multi-container">
-                {childEntries.map((x, index) => <div className="oplog-operation__multi-container-entry" key={index}>
-                    {this.renderOplogOperation(x)}
-                </div>)}
-
+                {childEntries.filter((x, index) => index < this.state.loadedChildEntriesCount)
+                    .map((x, index) => <div className="oplog-operation__multi-container-entry" key={index}>
+                        {this.renderOplogOperation(x)}
+                    </div>)}
+                {(this.state.loadedChildEntriesCount < childEntries.length)
+                    && <div className="oplog-operation__show-more-card">
+                        <ActionButton label={`Show more`}
+                            onClick={this.loadMoreChildEntries}
+                            type="button" />
+                        <div className="oplog-operation__show-more-card__operations-count">
+                            Loaded {this.state.loadedChildEntriesCount} items. Total operations count {childEntries.length}.
+                            </div>
+                    </div>}
             </div>
         } else {
             return <div className="oplog-operation__single-container">
@@ -93,20 +120,21 @@ export class OplogEntryViewer extends React.Component<OplogEntryProps, OplogEntr
         return self.indexOf(value) === index;
     }
 
-    getInvolvedCollections = (entry:OplogEntry): React.ReactNode[] => {
+    getInvolvedCollections = (entry: OplogEntry): React.ReactNode[] => {
         let collectionNames = !!entry.childEntries && !!entry.childEntries.length
-            ? entry.childEntries.map(x => x.collectionName).sort()
+            ? entry.childEntries.map(x => x.collectionName)
             : (!!entry.collectionName ? [entry.collectionName] : []);
 
-        if(!collectionNames.length){
+        if (!collectionNames.length) {
             collectionNames = ["System operation"];
         }
 
         return collectionNames.filter(this.onlyUnique)
-        .map<React.ReactNode>((t, i) => <span key={i} className={`${t === this.props.selectedCollection ? "oplog__collection--highlight": "" }`}>{t}</span>)
-         .reduce((accu: React.ReactNode[], elem: React.ReactNode) => {
-            return !accu.length ? [elem] : [...accu, ', ', elem]
-        }, [])
+            .sort()
+            .map<React.ReactNode>((t, i) => <span key={i} className={`${t === this.props.selectedCollection ? "oplog__collection--highlight" : ""}`}>{t}</span>)
+            .reduce((accu: React.ReactNode[], elem: React.ReactNode) => {
+                return !accu.length ? [elem] : [...accu, ', ', elem]
+            }, [])
     }
 
     onAccordionToggle = () => {
