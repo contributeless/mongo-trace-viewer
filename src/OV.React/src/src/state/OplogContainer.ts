@@ -12,7 +12,8 @@ export interface OplogContainerState {
     isNewItemsPresentCheckRunning: boolean;
     isNewItemsPresent: boolean;
     isNextPageLoadingRunning: boolean,
-    isLoadMoreAvailable: boolean
+    isLoadMoreAvailable: boolean,
+    isSearchStarted: boolean
 }
 
 export enum ListAction {
@@ -28,7 +29,8 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
         isNewItemsPresentCheckRunning: false,
         isNewItemsPresent: false,
         isNextPageLoadingRunning: false,
-        isLoadMoreAvailable: false
+        isLoadMoreAvailable: false,
+        isSearchStarted: false
     };
 
     newItemsInterval: NodeJS.Timeout | null = null;
@@ -95,10 +97,10 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
         }
     }
 
-    private fetchOplog = (maxTimestamp: string | null, minTimestamp: string | null, pageSize : number, skipLoadersChange: boolean = false): Promise<OplogListResponse> => {
+    private fetchOplog = async (maxTimestamp: string | null, minTimestamp: string | null, pageSize : number, skipLoadersChange: boolean = false): Promise<OplogListResponse> => {
         const currentFilter = this.filterContainer.currentFilter;
 
-        return this.makeRequest(() => OplogService.getOplog({
+        const result = await this.makeRequest(() => OplogService.getOplog({
             database: currentFilter.database || null,
             collection: currentFilter.collection || null,
             recordId: currentFilter.recordId || null,
@@ -113,6 +115,15 @@ export class OplogContainer extends BaseContainer<OplogContainerState> {
                 pageNumber: 1
             }
         }), skipLoadersChange);
+
+
+        if(!this.state.isSearchStarted){
+            await this.setState({
+                isSearchStarted: true
+            })
+        }
+
+        return result;
     }
 
     mergeOplog = async (response: OplogListResponse, action: ListAction = ListAction.replace): Promise<void> => {
