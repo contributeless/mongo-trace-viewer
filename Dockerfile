@@ -19,12 +19,17 @@ RUN npm run build
 RUN npm prune --production
 
 FROM node:16-alpine3.11 AS publish
+RUN adduser -D oploguser
 WORKDIR /usr/src/app
-COPY --from=backendbuild /usr/src/app/build/ ./build
-COPY --from=backendbuild /usr/src/app/node_modules/ ./node_modules
+
+
+COPY --from=backendbuild --chown=oploguser /usr/src/app/build/ ./build
+COPY --from=backendbuild --chown=oploguser /usr/src/app/node_modules/ ./node_modules
+
+RUN chown oploguser /usr/src/app
+USER oploguser
 
 ENV PORT=80
 ENV NODE_ENV=production
-
 EXPOSE 80
 ENTRYPOINT node ./build/server.js

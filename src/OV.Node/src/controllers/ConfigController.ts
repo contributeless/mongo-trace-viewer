@@ -9,7 +9,6 @@ class ConfigController {
     try {
         const configData: MongoConfig = req.body;
         
-
         if(await MongoConnectionFactory.isConnectionStringValid(configData.connectionString)){
            await MongoConfigStorage.save(configData);
            res.json({
@@ -32,7 +31,8 @@ class ConfigController {
         
         res.json({
             isConfigured: await MongoConnectionFactory.isInitialized(),
-            connectionString: config?.connectionString
+            connectionString: config.isConnectionStringEditLocked ? "" : config?.connectionString,
+            isConnectionStringEditLocked: config.isConnectionStringEditLocked
         });
       } catch (error) {
       next(error);

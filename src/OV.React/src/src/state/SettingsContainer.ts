@@ -8,7 +8,8 @@ import { ServiceContainer } from "./ServiceContainer";
 export interface SettingsContainerState {
     settings: SettingsModel,
     isConfigured: boolean,
-    isSettingsOpened : boolean
+    isSettingsOpened : boolean,
+    isConnectionStringEditLocked: boolean
 }
 
 export class SettingsContainer extends BaseContainer<SettingsContainerState> {
@@ -17,7 +18,8 @@ export class SettingsContainer extends BaseContainer<SettingsContainerState> {
             connectionString: ""
         },
         isConfigured: false,
-        isSettingsOpened: false
+        isSettingsOpened: false,
+        isConnectionStringEditLocked: false
     };
 
     constructor(serviceContainer: ServiceContainer){
@@ -32,8 +34,13 @@ export class SettingsContainer extends BaseContainer<SettingsContainerState> {
             settings: {
                 connectionString: configStatus.connectionString ?? ""
             },
-            isSettingsOpened: configStatus.isConfigured === false
+            isSettingsOpened: configStatus.isConfigured === false && !configStatus.isConnectionStringEditLocked,
+            isConnectionStringEditLocked: configStatus.isConnectionStringEditLocked
         });
+    }
+
+    isAppCouldBeUsed = () => {
+        return !(!this.isSettingsValid() && this.state.isConnectionStringEditLocked);
     }
 
     isSettingsValid = () => {

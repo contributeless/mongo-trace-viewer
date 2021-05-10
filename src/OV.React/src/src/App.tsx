@@ -9,6 +9,7 @@ import { SettingsContainer } from './state/SettingsContainer';
 import { ErrorNotificationList } from './views/ErrorNotificationList';
 import EventHub from './services/EventHub';
 import { EventTypes } from './models/EventTypes';
+import { AppIsUnavailableModal } from './views/AppIsUnavailableModal';
 
 interface AppProps {
 
@@ -50,7 +51,8 @@ export class App extends React.Component<AppProps, AppState> {
                             <Loader isEnabled={service.isLoadingEnabled()} />
                         )}
                     </Subscribe>
-                    <ErrorNotificationList></ErrorNotificationList>
+                    <AppIsUnavailableModal />
+                    <ErrorNotificationList />
                 </>
             </Provider>
         );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./oplogSettingsPanel.styl";
 import SettingsIcon from "./icons/settings.svg"
 import { Tooltip } from "./Tooltip";
@@ -8,10 +8,8 @@ import { SettingsContainer } from "../state/SettingsContainer";
 import { Subscribe } from "unstated";
 
 export function OplogSettingsPanel() {
-
-
     return <Subscribe to={[SettingsContainer]}>
-        {(settings: SettingsContainer) => (
+        {(settings: SettingsContainer) => (settings.state.isConnectionStringEditLocked ? null :
             <Tooltip text="Settings" disabled={settings.state.isSettingsOpened}>
                 <div className="oplog-settings" onClick={() => settings.openSettings()}>
                     <SettingsIcon className="oplog-settings__icon" />
