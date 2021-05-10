@@ -1,3 +1,6 @@
+
+const development: boolean = !process.env.APP_ENV || process.env.APP_ENV === 'development';
+
 export const settings = {
-    baseUrl: "http://localhost:3000"
+    baseUrl: development ? "http://localhost:3000" : "/"
 } 
