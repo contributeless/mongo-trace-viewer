@@ -52,9 +52,9 @@ The best way to understand it is to try it. Please download the [executable](htt
 
 - Oplog.rs collection is only available for MongoDB instances running in ReplicaSet mode. So it will not be available for standalone MongoDB instances. If you want to use the oplog viewer in this case, see [How to setup an oplog on a single MongoDB instance](https://tuttlem.github.io/2014/06/13/how-to-setup-an-oplog-on-a-single-mongodb-instance.html)
 - The records in oplog.rs collection can be removed by the MongoDB instance. According to [documentation](https://docs.mongodb.com/manual/core/replica-set-oplog/#minimum-oplog-retention-period):
->  The mongod only removes an oplog entry if:
->  1.The oplog has reached the **maximum configured size**, and
->  2.The oplog entry is **older than the configured number of hours** based on the host system clock.
+>  The mongod only removes an oplog entry if:<br/>
+>  1.The oplog has reached the **maximum configured size**, and<br/>
+>  2.The oplog entry is **older than the configured number of hours** based on the host system clock.<br/>
 > By default MongoDB does not set a minimum oplog retention period and automatically truncates the oplog starting with the oldest entries to maintain the configured maximum oplog size.
 
 <div align="right">
