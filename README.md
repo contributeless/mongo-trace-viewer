@@ -17,6 +17,7 @@ So as a developer, why not solve it the way that fits better with what I am good
 <ul>
 <li><a href="#what-is-mongodb-replica-set-oplog">What is MongoDb Replica Set Oplog</a></li>
 <li><a href="#get-started">Get Started</a></li>
+<li><a href="#features">Features</a></li>
 <li><a href="#limitations">Limitations</a></li>
 <li><a href="#tech-stack">Tech Stack</a></li>
 <li><a href="#binaries">Binaries</a></li>
@@ -42,6 +43,32 @@ The best way to understand it is to try it. Please download the [executable](htt
 
 <p align="center">
     <img src="/assets/binaries.png?raw=true" alt="Binaries"/>
+</p>
+
+<div align="right">
+  <b><a href="#index">↥ Back To Top</a></b>
+</div>
+
+## Features
+
+- Search for data changes in database collections
+<p align="center" width="100%">
+    <img src="/assets/search.gif?raw=true" alt="Search"/>
+</p>
+
+- Filter by Record id
+<p align="center" width="100%">
+    <img src="/assets/id_filtering.gif?raw=true" alt="Id filtering"/>
+</p>
+
+- Filter by Min/Max date of changes
+<p align="center" width="100%">
+    <img src="/assets/date_filtering.gif?raw=true" alt="Date filtering"/>
+</p>
+
+- Favourite filters
+<p align="center" width="100%">
+    <img src="/assets/favourite_filters.gif?raw=true" alt="Favourite filters"/>
 </p>
 
 <div align="right">
