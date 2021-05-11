@@ -18,6 +18,7 @@ So as a developer, why not solve it the way that fits better with what I am good
 <li><a href="#what-is-mongodb-replica-set-oplog">What is MongoDb Replica Set Oplog</a></li>
 <li><a href="#get-started">Get Started</a></li>
 <li><a href="#features">Features</a></li>
+<li><a href="#docker-support">Docker support</a></li>
 <li><a href="#limitations">Limitations</a></li>
 <li><a href="#tech-stack">Tech Stack</a></li>
 <li><a href="#binaries">Binaries</a></li>
@@ -70,6 +71,19 @@ The best way to understand it is to try it. Please download the [executable](htt
 <p align="center" width="100%">
     <img src="/assets/favourite_filters.gif?raw=true" alt="Favourite filters"/>
 </p>
+
+<div align="right">
+  <b><a href="#index">↥ Back To Top</a></b>
+</div>
+
+## Docker support
+The app is also available on [DockerHub](https://hub.docker.com/repository/docker/contributeless/mongo-oplog-viewer)
+
+Use the following command to run the image locally:
+
+```
+docker run -p 8080:80 contributeless/mongo-oplog-viewer:v0.0.3
+```
 
 <div align="right">
   <b><a href="#index">↥ Back To Top</a></b>
