@@ -17,6 +17,7 @@ So as a developer, why not solve it the way that fits better with what I am good
 <ul>
 <li><a href="#what-is-mongodb-replica-set-oplog">What is MongoDb Replica Set Oplog</a></li>
 <li><a href="#get-started">Get Started</a></li>
+<li><a href="#limitations">Limitations</a></li>
 <li><a href="#tech-stack">Tech Stack</a></li>
 <li><a href="#binaries">Binaries</a></li>
 <li><a href="#useful-links">Useful links</a></li>
@@ -34,10 +35,27 @@ Official documentation for [Replica Set Oplog](https://docs.mongodb.com/manual/c
 </div>
 
 ## Get Started
-The best way to understand it is to try it. Please download the [executable](https://github.com/contributeless/mongo-oplog-viewer/releases) for your operating system.
+
+Here is a light **[demo](https://mongo-oplog-viewer.herokuapp.com/)**. The app is deployed on [heroku](https://dashboard.heroku.com/) and uses a free [Mongo Atlas](https://www.mongodb.com/cloud/atlas) instance. It can be "a bit" slow due to performance limitations of the free services.
+
+The best way to understand it is to try it. Please download the [executable](https://github.com/contributeless/mongo-oplog-viewer/releases) for your operating system and try the application with local version of MongoDB.
+
 <p align="center">
     <img src="/assets/binaries.png?raw=true" alt="Binaries"/>
 </p>
+
+<div align="right">
+  <b><a href="#index">↥ Back To Top</a></b>
+</div>
+
+## Limitations
+
+- Oplog.rs collection is only available for MongoDB instances running in ReplicaSet mode. So it will not be available for standalone MongoDB instances. If you want to use the oplog viewer in this case, see [How to setup an oplog on a single MongoDB instance](https://tuttlem.github.io/2014/06/13/how-to-setup-an-oplog-on-a-single-mongodb-instance.html)
+- The records in oplog.rs collection can be removed by the MongoDB instance. According to [documentation](https://docs.mongodb.com/manual/core/replica-set-oplog/#minimum-oplog-retention-period):
+>  The mongod only removes an oplog entry if:
+>  1.The oplog has reached the **maximum configured size**, and
+>  2.The oplog entry is **older than the configured number of hours** based on the host system clock.
+> By default MongoDB does not set a minimum oplog retention period and automatically truncates the oplog starting with the oldest entries to maintain the configured maximum oplog size.
 
 <div align="right">
   <b><a href="#index">↥ Back To Top</a></b>

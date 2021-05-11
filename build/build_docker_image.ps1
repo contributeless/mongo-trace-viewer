@@ -4,8 +4,16 @@ function Get-AppVersion {
     return $version;
 }
 
-$APP_VERSION= Get-AppVersion "."
+$APP_VERSION = "latest"
 
-docker build --tag oplog-viewer:$APP_VERSION ..
+$passedAppVersion=$args[0]
+
+if($null -eq $passedAppVersion) {
+    $APP_VERSION = Get-AppVersion "."
+} else{
+    $APP_VERSION = $passedAppVersion
+}
+
+docker build --tag mongo-oplog-viewer:$APP_VERSION ..
 
 docker image prune --force --filter label=stage=temp-build
