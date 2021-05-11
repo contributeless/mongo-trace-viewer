@@ -4,7 +4,7 @@
     <br>
 </h1>
 
-# Mongo oplog viewer - [Latest release](https://github.com/contributeless/mongo-oplog-viewer/releases)
+# Mongo oplog viewer - [Latest release](https://github.com/contributeless/mongo-oplog-viewer/releases/tag/v0.0.4-beta)
 
 ## Motivation
 
@@ -82,7 +82,7 @@ The app is also available on [DockerHub](https://hub.docker.com/repository/docke
 Use the following command to run the image locally:
 
 ```
-docker run -p 8080:80 contributeless/mongo-oplog-viewer:v0.0.3
+docker run -p 8080:80 contributeless/mongo-oplog-viewer:v0.0.4
 ```
 
 <div align="right">
