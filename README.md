@@ -6,7 +6,7 @@
 
 # Mongo oplog viewer - [Latest release](https://github.com/contributeless/mongo-oplog-viewer/releases/tag/v0.0.4-beta)
 
-##Warning: This is a proof-of-concept project, additional features will be added only when needed.
+## Warning: This is a proof-of-concept project, additional features will be added only when needed.
 
 ## Motivation
 
