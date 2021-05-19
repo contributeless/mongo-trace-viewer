@@ -6,6 +6,8 @@
 
 # Mongo oplog viewer - [Latest release](https://github.com/contributeless/mongo-oplog-viewer/releases/tag/v0.0.4-beta)
 
+##Warning: This is a proof-of-concept project, additional features will be added only when needed.
+
 ## Motivation
 
 I always found myself spending too much time debugging data loss cases using MongoDB. Whenever I need to view what happened to my data, I had to use  robomongo/robo3t or something else to view **mongo/local/oplog.rs** collection and build complex queries to get the actions that happened in my database.
