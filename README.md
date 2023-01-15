@@ -1,10 +1,10 @@
 <h1 align="center">
     <br>
-    <img src="/assets/logo.png?raw=true" alt="Mongo oplog viewer"/>
+    <img src="/assets/logo.png?raw=true" alt="Mongo trace viewer"/>
     <br>
 </h1>
 
-# Mongo oplog viewer - [Latest release](https://github.com/contributeless/mongo-oplog-viewer/releases/tag/v0.0.4-beta)
+# Mongo trace viewer - [Latest release](https://github.com/contributeless/mongo-trace-viewer/releases/tag/v0.0.4-beta)
 
 ## Warning: This is a proof-of-concept project, additional features will be added only when needed.
 
